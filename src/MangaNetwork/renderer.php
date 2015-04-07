@@ -1,0 +1,20 @@
+<?php
+/**
+ * Renderer
+ * @package MangaNetwork
+ */
+
+/**
+ * Renderer used to write the response in a formated way
+ *
+ * @param mixed $data The data to display. This data will be converted to JSON using
+ * PHP's json_encode method, so associatives arrays will often be the best choice
+ * @param bool $error True if an error occurred, false otherwise
+ * @param int $code The HTTP code of the request
+ */
+function render($data, $error=false, $code=200) {
+	http_response_code($code);
+	echo json_encode([ "error" => $error, "code" => $code, "data" => $data ]);
+}
+
+?>

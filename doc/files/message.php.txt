@@ -1,0 +1,7 @@
+<?php
+
+function render($content, $error=false, $code=200) {
+	echo json_last_error([ "error" => $error, "code" => $code, "data" => $data ]);
+}
+
+?>
