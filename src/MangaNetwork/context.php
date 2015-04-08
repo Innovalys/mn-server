@@ -22,7 +22,7 @@ class MnContext {
 	/**
 	 * @var string The URI requested
 	 */
-	public $url;
+	public $uri;
 
 	/**
 	 * @var \User|null The user from the session
