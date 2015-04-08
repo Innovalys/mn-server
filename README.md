@@ -1,2 +1,2 @@
-# mn-server
+# MangaNetwork
 MangaNetwork server source code
