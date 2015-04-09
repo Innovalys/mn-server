@@ -19,10 +19,10 @@ try {
 
 	// Router definition
 	$router = new MnActionRouter();
-	$router->addRule(new MnActionRule("/^\/test_rest\/test\/?$/", "GET", [], [], function($context) {
+	$router->addRule(new MnActionRule("/\/test_rest\/test\/?$/", "GET", [], [], function($context) {
 		render([ "hello" => "world" ]);
 	}));
-	$router->addRule(new MnActionRule("/^\/test_rest\/test\/([^\/]+)\/?$/", "GET", [], ["id"], function($context) {
+	$router->addRule(new MnActionRule("/\/test_rest\/test\/([^\/]+)\/?$/", "GET", [], ["id"], function($context) {
 		render([ "hello" => "world", "from" => $context->uri, "id" => $context->params["id"] ]);
 	}));
 
