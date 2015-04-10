@@ -34,6 +34,7 @@ class MnContext {
 	 */
 	function __construct() {
 		$this->params = array_merge($_GET, $_POST);
+		$this->params["json"] = json_decode(file_get_contents("php://input"), true);
 		$this->method = $_SERVER['REQUEST_METHOD'];
 		$this->uri = $_SERVER['REQUEST_URI'];
 		$this->user = isset($_SESSION['USER']) ? $_SESSION['USER'] : null;

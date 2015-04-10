@@ -4,7 +4,8 @@
  * Main PHP endpoint
  */
 
-include 'MangaNetwork/user.php';
+include_once 'MangaNetwork/user.php';
+include_once 'MangaNetwork/action/user/create.php';
 include 'MangaNetwork/renderer.php';
 include 'MangaNetwork/exception.php';
 include 'MangaNetwork/action_router.php';
@@ -19,6 +20,9 @@ try {
 
 	// Router definition
 	$router = new MnActionRouter();
+	$router->addRule(new MnActionRule("/\/test_rest\/user\/?$/", "PUT", [], [], function($context) {
+		render(CreateUser($context));
+	}));
 	$router->addRule(new MnActionRule("/\/test_rest\/test\/?$/", "GET", [], [], function($context) {
 		render([ "hello" => "world" ]);
 	}));
