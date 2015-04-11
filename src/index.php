@@ -6,6 +6,7 @@
 
 include_once 'MangaNetwork/user.php';
 include_once 'MangaNetwork/action/user/create.php';
+include_once 'MangaNetwork/action/user/get.php';
 include 'MangaNetwork/renderer.php';
 include 'MangaNetwork/exception.php';
 include 'MangaNetwork/action_router.php';
@@ -22,6 +23,9 @@ try {
 	$router = new MnActionRouter();
 	$router->addRule(new MnActionRule("/\/test_rest\/user\/?$/", "PUT", [], [], function($context) {
 		render(CreateUser($context));
+	}));
+	$router->addRule(new MnActionRule("/\/test_rest\/user\/([^\/]+)/", "GET", [], ["id"], function($context) {
+		render(GetUser($context));
 	}));
 	$router->addRule(new MnActionRule("/\/test_rest\/test\/?$/", "GET", [], [], function($context) {
 		render([ "hello" => "world" ]);

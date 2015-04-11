@@ -5,17 +5,16 @@ include_once 'MangaNetwork/utils.php';
 
 function CreateUser($context) {
 
-	$data = $context->params["json"];
-	var_dump($data);
+	$user = $context->params["json"];
 
 	$db = GetDBConnection();
 	
 	$query = $db->prepare("INSERT INTO user (login, password, mail, name, admin) 
-							VALUES (?, ?, ?, ?, ?)");
+							VALUES (:login, :password, :mail, :name, :admin)");
 
-	$query->execute([$data['login'], $data["password"], $data["mail"], $data["name"], $data["admin"]]);
+	$query->execute($user);
 
-	return ["data" =>  $data];
+	return $user;
 
 }
 
