@@ -11,6 +11,8 @@ include_once 'MangaNetwork/renderer.php';
 include_once 'MangaNetwork/exception.php';
 include_once 'MangaNetwork/action_router.php';
 include_once 'MangaNetwork/context.php';
+include_once 'MangaNetwork/action/manga/get.php';
+
 
 session_start();
 
@@ -32,6 +34,9 @@ try {
 	}));
 	$router->addRule(new MnActionRule("/\/test_rest\/test\/([^\/]+)\/?$/", "GET", [], ["id"], function($context) {
 		render([ "hello" => "world", "from" => $context->uri, "id" => $context->params["id"] ]);
+	}));
+	$router->addRule(new MnActionRule("/\/test_rest\/manga\/([^\/]+)/", "GET", [], ["id"], function($context) {
+		render(GetManga($context));
 	}));
 
 	// Dispatch
