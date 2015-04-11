@@ -1,21 +1,52 @@
 <?php
+/**
+ * Manga Network validator
+ * @package MangaNetwork
+ */
 
 include_once 'exception.php';
 
 /**
-* 
-*/
+ * Validator class. This class is used to validate associative array (usually $_POST or $_GET values)
+ * using predefined rules that can be be set using the addRule method
+ */
 class MnValidator {
 	
+	/**
+	 * @var \MnValidatorRule[] The list rules, by names
+	 */
 	private $rules = [];
+
+	/**
+	 * @var mixed[] The validated values, by name
+	 */
 	private $validatedValue = [];
 
+	/**
+	 * Empty constructor
+	 */
 	function __construct() { }
 
+	/**
+	 * Add a rule to the validator. See the MnValidationRule for
+	 * more information
+	 * @param string $name The name of the value to use with the given rule
+	 * @param MnValidatorRule $rule The rule to use with the given name
+	 * @return void
+	 */
 	function addRule($name, $rule) {
 		$this->rules[$name] = $rule;
 	}
 
+	/**
+	 * Validate the given data using the previously registered names and
+	 * rules. This method will throw an exception if any required value
+	 * is invalidated. In case of success, the previously validated data
+	 * wil be overwritten 
+	 * @param  mixed[] $data The data to validate. This data can be any enumerable element
+	 * @return void
+	 * @throws \MnException Thrown if any required value is invalidated
+	 */
 	function validate($data) {
 		$errors = [];
 		$this->validatedValue =  [];
@@ -37,11 +68,19 @@ class MnValidator {
 		}
 	}
 
+	/**
+	 * Return the validated result. You must first run the validate methods to generate results
+	 * @return mixed[] The validated value. Any optional value not validated will be set to NULL
+	 */
 	function getValidatedValues() {
 		return $this->validatedValue;
 	}
 }
 
+/**
+ * Validator rule. This rule is used to know if any value is good to be used
+ * using a set of simple yet powerfull tests
+ */
 class MnValidatorRule {
 
 	// General
@@ -62,8 +101,19 @@ class MnValidatorRule {
 	private $minValue = false;
 	private $maxValue = false;
 
+	/**
+	 * Empty private constructor
+	 */
 	private function __construct() {}
 
+	/**
+	 * Create a rule for a required string
+	 * @param  string  $regex     The regex that the string must match
+	 * @param  integer $maxLenght The max lenght of the string
+	 * @param  integer $minLenght The min lenght of the string
+	 * @param  function  $check     User defined test
+	 * @return void
+	 */
 	static function requiredString($regex=NULL, $maxLenght=0, $minLenght=0, $check=NULL) {
 		$rule = new MnValidatorRule();
 		$rule->regex = $regex;
@@ -76,6 +126,13 @@ class MnValidatorRule {
 		return $rule;
 	}
 
+	/**
+	 * Create a rule for a required number
+	 * @param  integer $minValue The minimum value of the number
+	 * @param  integer $maxValue The maximum value of the number
+	 * @param  function  $check     User defined test
+	 * @return void
+	 */
 	static function requiredNumber($minValue=false, $maxValue=false, $check=NULL) {
 		$rule = new MnValidatorRule();
 		$rule->required = true;
@@ -87,6 +144,11 @@ class MnValidatorRule {
 		return $rule;
 	}
 
+	/**
+	 * Create a rule for an required boolean
+	 * @param  function  $check     User defined test
+	 * @return void
+	 */
 	static function requiredBoolean($check=NULL) {
 		$rule = new MnValidatorRule();
 		$rule->required = true;
@@ -96,6 +158,14 @@ class MnValidatorRule {
 		return $rule;
 	}
 
+	/**
+	 * Create a rule for an optional string
+	 * @param  string  $regex     The regex that the string must match
+	 * @param  integer $maxLenght The max lenght of the string
+	 * @param  integer $minLenght The min lenght of the string
+	 * @param  function  $check     User defined test
+	 * @return void
+	 */
 	static function optionalString($regex=NULL, $maxLenght=0, $minLenght=0, $check=NULL) {
 		$rule = new MnValidatorRule();
 		$rule->regex = $regex;
@@ -107,7 +177,14 @@ class MnValidatorRule {
 		return $rule;
 	}
 
-	static function optionalInt($minValue=false, $maxValue=false, $check=NULL) {
+	/**
+	 * Create a rule for an optional number
+	 * @param  integer $minValue The minimum value of the number
+	 * @param  integer $maxValue The maximum value of the number
+	 * @param  function  $check     User defined test
+	 * @return void
+	 */
+	static function optionalNumber($minValue=false, $maxValue=false, $check=NULL) {
 		$rule = new MnValidatorRule();
 		$rule->minValue = $minValue;
 		$rule->maxValue = $maxValue;
@@ -117,6 +194,11 @@ class MnValidatorRule {
 		return $rule;
 	}
 
+	/**
+	 * Create a rule for an optional boolean
+	 * @param  function  $check     User defined test
+	 * @return void
+	 */
 	static function optionalBoolean($check=NULL) {
 		$rule = new MnValidatorRule();
 		$rule->check = $check;
@@ -125,6 +207,12 @@ class MnValidatorRule {
 		return $rule;
 	}
 
+	/**
+	 * Check if a string is valid
+	 * @param  string $name The value name
+	 * @param  string $val  The value
+	 * @return string       The validated string or NULL
+	 */
 	private function checkString($name, $val) {
 		$size = strlen($val);
 
@@ -163,6 +251,12 @@ class MnValidatorRule {
 		return $val;
 	}
 
+	/**
+	 * Check if a boolean is valid
+	 * @param  string $name The value name
+	 * @param  bool $val  The value
+	 * @return bool       The validated boolean or NULL 
+	 */
 	private function checkBool($name, $val) {
 		// Custom check
 		if($this->check && $this->check($val)) {
@@ -178,6 +272,12 @@ class MnValidatorRule {
 			return false;
 	}
 
+	/**
+	 * Check if an int is valid
+	 * @param  string $name The value name
+	 * @param  int $val  The value
+	 * @return int       The validated int or NULL 
+	 */
 	private function checkNumber($name, $val) {
 		$val = $val + 0;
 
@@ -208,6 +308,12 @@ class MnValidatorRule {
 		return $val;
 	}
 
+	/**
+	 * Check if a value if valid
+	 * @param  string $name   The value's name
+	 * @param  mixed[] $values The array of value
+	 * @return mixed The validated value
+	 */
 	function check($name, $values) {
 		if(isset($values[$name]) && $values[$name] != NULL) {
 			switch ($this->type) {
