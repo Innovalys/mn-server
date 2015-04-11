@@ -8,19 +8,19 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 -- -----------------------------------------------------
--- Schema mydb
+-- Schema manga-network
 -- -----------------------------------------------------
 
 -- -----------------------------------------------------
--- Schema mydb
+-- Schema manga-network
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
-USE `mydb` ;
+CREATE SCHEMA IF NOT EXISTS `manga-network` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+USE `manga-network` ;
 
 -- -----------------------------------------------------
--- Table `mydb`.`user`
+-- Table `manga-network`.`user`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`user` (
+CREATE TABLE IF NOT EXISTS `manga-network`.`user` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `login` VARCHAR(45) NOT NULL,
   `password` VARCHAR(45) NOT NULL,
@@ -32,9 +32,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`manga`
+-- Table `manga-network`.`manga`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`manga` (
+CREATE TABLE IF NOT EXISTS `manga-network`.`manga` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(45) NULL,
   `page_nb` INT NULL,
@@ -51,9 +51,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`manga_page`
+-- Table `manga-network`.`manga_page`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`manga_page` (
+CREATE TABLE IF NOT EXISTS `manga-network`.`manga_page` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `page_nb` INT NULL,
   `link` VARCHAR(512) NULL,
@@ -62,16 +62,16 @@ CREATE TABLE IF NOT EXISTS `mydb`.`manga_page` (
   INDEX `fk_manga_page_manga_idx` (`manga_id` ASC),
   CONSTRAINT `fk_manga_page_manga`
     FOREIGN KEY (`manga_id`)
-    REFERENCES `mydb`.`manga` (`id`)
+    REFERENCES `manga-network`.`manga` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`manga_chapter`
+-- Table `manga-network`.`manga_chapter`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`manga_chapter` (
+CREATE TABLE IF NOT EXISTS `manga-network`.`manga_chapter` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `page_start` INT NULL,
   `page_nb` INT NULL,
@@ -81,16 +81,16 @@ CREATE TABLE IF NOT EXISTS `mydb`.`manga_chapter` (
   INDEX `fk_manga_chapter_manga1_idx` (`manga_id` ASC),
   CONSTRAINT `fk_manga_chapter_manga1`
     FOREIGN KEY (`manga_id`)
-    REFERENCES `mydb`.`manga` (`id`)
+    REFERENCES `manga-network`.`manga` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`genre`
+-- Table `manga-network`.`genre`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`genre` (
+CREATE TABLE IF NOT EXISTS `manga-network`.`genre` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL,
   PRIMARY KEY (`id`))
@@ -98,9 +98,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`user_has_manga`
+-- Table `manga-network`.`user_has_manga`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`user_has_manga` (
+CREATE TABLE IF NOT EXISTS `manga-network`.`user_has_manga` (
   `user_id` INT NOT NULL,
   `manga_id` INT NOT NULL,
   `favoris` TINYINT(1) NULL,
@@ -112,21 +112,21 @@ CREATE TABLE IF NOT EXISTS `mydb`.`user_has_manga` (
   INDEX `fk_user_has_manga_user1_idx` (`user_id` ASC),
   CONSTRAINT `fk_user_has_manga_user1`
     FOREIGN KEY (`user_id`)
-    REFERENCES `mydb`.`user` (`id`)
+    REFERENCES `manga-network`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_has_manga_manga1`
     FOREIGN KEY (`manga_id`)
-    REFERENCES `mydb`.`manga` (`id`)
+    REFERENCES `manga-network`.`manga` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`genre_has_manga`
+-- Table `manga-network`.`genre_has_manga`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`genre_has_manga` (
+CREATE TABLE IF NOT EXISTS `manga-network`.`genre_has_manga` (
   `genre_id` INT NOT NULL,
   `manga_id` INT NOT NULL,
   PRIMARY KEY (`genre_id`, `manga_id`),
@@ -134,21 +134,21 @@ CREATE TABLE IF NOT EXISTS `mydb`.`genre_has_manga` (
   INDEX `fk_genre_has_manga_genre1_idx` (`genre_id` ASC),
   CONSTRAINT `fk_genre_has_manga_genre1`
     FOREIGN KEY (`genre_id`)
-    REFERENCES `mydb`.`genre` (`id`)
+    REFERENCES `manga-network`.`genre` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_genre_has_manga_manga1`
     FOREIGN KEY (`manga_id`)
-    REFERENCES `mydb`.`manga` (`id`)
+    REFERENCES `manga-network`.`manga` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`author`
+-- Table `manga-network`.`author`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`author` (
+CREATE TABLE IF NOT EXISTS `manga-network`.`author` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL,
   PRIMARY KEY (`id`))
@@ -156,9 +156,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`author_has_manga`
+-- Table `manga-network`.`author_has_manga`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`author_has_manga` (
+CREATE TABLE IF NOT EXISTS `manga-network`.`author_has_manga` (
   `author_id` INT NOT NULL,
   `manga_id` INT NOT NULL,
   PRIMARY KEY (`author_id`, `manga_id`),
@@ -166,21 +166,21 @@ CREATE TABLE IF NOT EXISTS `mydb`.`author_has_manga` (
   INDEX `fk_author_has_manga_author1_idx` (`author_id` ASC),
   CONSTRAINT `fk_author_has_manga_author1`
     FOREIGN KEY (`author_id`)
-    REFERENCES `mydb`.`author` (`id`)
+    REFERENCES `manga-network`.`author` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_author_has_manga_manga1`
     FOREIGN KEY (`manga_id`)
-    REFERENCES `mydb`.`manga` (`id`)
+    REFERENCES `manga-network`.`manga` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `mydb`.`user_has_user`
+-- Table `manga-network`.`user_has_user`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `mydb`.`user_has_user` (
+CREATE TABLE IF NOT EXISTS `manga-network`.`user_has_user` (
   `user_id_following` INT NOT NULL,
   `user_id_followed` INT NOT NULL,
   PRIMARY KEY (`user_id_following`, `user_id_followed`),
@@ -188,12 +188,12 @@ CREATE TABLE IF NOT EXISTS `mydb`.`user_has_user` (
   INDEX `fk_user_has_user_user1_idx` (`user_id_following` ASC),
   CONSTRAINT `fk_user_has_user_user1`
     FOREIGN KEY (`user_id_following`)
-    REFERENCES `mydb`.`user` (`id`)
+    REFERENCES `manga-network`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_has_user_user2`
     FOREIGN KEY (`user_id_followed`)
-    REFERENCES `mydb`.`user` (`id`)
+    REFERENCES `manga-network`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

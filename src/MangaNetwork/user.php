@@ -12,7 +12,6 @@ class MnUser {
 	private $id;
 	private $login;
 	private $pass;
-
 	private $credentials;
 
 	/**
