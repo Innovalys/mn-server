@@ -13,7 +13,8 @@ function CreateUser($context) {
 							VALUES (:login, :password, :mail, :name, :admin)");
 
 	$query->execute($user);
-
+    $user['id'] = $db->lastInsertId(); 
+    
 	return $user;
 
 }
