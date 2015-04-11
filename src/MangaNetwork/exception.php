@@ -9,7 +9,9 @@
  * interrupt the creation of the request, and will be handled outside of the
  * action
  */
-class MnException extends Exception {
+class MnException extends Exception implements JsonSerializable {
+
+    private $data;
 
 	/**
 	 * The Manga Network exception
@@ -17,8 +19,9 @@ class MnException extends Exception {
 	 * @param string $message The string message to display
 	 * @param int $code The error code, also used as the HTTP return code
 	 */
-    public function __construct($message, $code = 200) {
+    public function __construct($message, $code = 200, $data = NULL) {
         parent::__construct($message, $code, NULL);
+        $this->data = $data;
     }
 
     /**
@@ -26,8 +29,11 @@ class MnException extends Exception {
      *
      * @return string[] Array containing all the exception informations
      */
-    public function getObjectToRender() {
-    	return [ "message" => $this->message, "code" => $this->code ];
+    public function jsonSerialize() {
+        if($this->data) 
+           return [ "message" => $this->message, "code" => $this->code, "data" => $this->data ];
+        else
+    	   return [ "message" => $this->message, "code" => $this->code ];
     }
 }
 

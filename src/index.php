@@ -7,11 +7,11 @@
 include_once 'MangaNetwork/user.php';
 include_once 'MangaNetwork/action/user/create.php';
 include_once 'MangaNetwork/action/user/get.php';
+include_once 'MangaNetwork/renderer.php';
+include_once 'MangaNetwork/exception.php';
+include_once 'MangaNetwork/action_router.php';
+include_once 'MangaNetwork/context.php';
 include_once 'MangaNetwork/action/manga/get.php';
-include 'MangaNetwork/renderer.php';
-include 'MangaNetwork/exception.php';
-include 'MangaNetwork/action_router.php';
-include 'MangaNetwork/context.php';
 
 
 session_start();
@@ -43,9 +43,9 @@ try {
 	$router->route($context);
 
 } catch(MnException $e) {
-	render($e->getObjectToRender(), true, $e->getCode()); // Handled error
+	render($e, true, $e->getCode()); // Handled error
 } catch(Exception $e) {
-	render($e->getMessage(), true, 500); // Server error
+	render($e, true, 500); // Server error
 }
 
 ?>
