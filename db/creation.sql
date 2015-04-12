@@ -38,14 +38,14 @@ CREATE TABLE IF NOT EXISTS `manga-network`.`manga` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(45) NULL,
   `page_nb` INT NULL,
-  `page` INT NULL,
   `source_API` VARCHAR(45) NOT NULL,
   `source_URL` VARCHAR(255) NOT NULL,
   `source_ID` INT NOT NULL,
   `update_date` DATETIME NULL,
   `release_date` DATETIME NULL,
   `completed` TINYINT(1) NULL,
-  `description` TEXT NULL,
+  `description` VARCHAR(255) NULL,
+  `cover` TEXT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
