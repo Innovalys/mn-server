@@ -91,6 +91,7 @@ class MnValidatorRule {
 	const TYPE_NUMBER = 1;
 	const TYPE_STRING = 2;
 	const TYPE_BOOL = 3;
+	const TYPE_ARRAY = 4;
 
 	// String
 	private $maxLenght = false;
@@ -159,6 +160,20 @@ class MnValidatorRule {
 	}
 
 	/**
+	 * Create a rule for an required array
+	 * @param  function  $check     User defined test
+	 * @return void
+	 */
+	static function requiredArray($check=NULL) {
+		$rule = new MnValidatorRule();
+		$rule->required = true;
+		$rule->check = $check;
+		$rule->type = MnValidatorRule::TYPE_ARRAY;
+
+		return $rule;
+	}
+
+	/**
 	 * Create a rule for an optional string
 	 * @param  string  $regex     The regex that the string must match
 	 * @param  integer $maxLenght The max lenght of the string
@@ -203,6 +218,19 @@ class MnValidatorRule {
 		$rule = new MnValidatorRule();
 		$rule->check = $check;
 		$rule->type = MnValidatorRule::TYPE_BOOL;
+
+		return $rule;
+	}
+
+	/**
+	 * Create a rule for an optional array
+	 * @param  function  $check     User defined test
+	 * @return void
+	 */
+	static function optionalArray($check=NULL) {
+		$rule = new MnValidatorRule();
+		$rule->check = $check;
+		$rule->type = MnValidatorRule::TYPE_ARRAY;
 
 		return $rule;
 	}
@@ -273,6 +301,27 @@ class MnValidatorRule {
 	}
 
 	/**
+	 * Check if an, array is valid
+	 * @param  string $name The value name
+	 * @param  bool $val  The value
+	 * @return bool       The validated array or [] 
+	 */
+	private function checkArray($name, $val) {
+		// Custom check
+		if($this->check && $this->check($val)) {
+			if($this->required)
+				throw new MnException("Error : rejected required array '" . $name . "'", 400);
+			else
+				return NULL;
+		}
+
+		if(is_array($val))
+			return $val;
+		else
+			return [];
+	}
+
+	/**
 	 * Check if an int is valid
 	 * @param  string $name The value name
 	 * @param  int $val  The value
@@ -315,6 +364,7 @@ class MnValidatorRule {
 	 * @return mixed The validated value
 	 */
 	function check($name, $values) {
+		// Check
 		if(isset($values[$name]) && $values[$name] != NULL) {
 			switch ($this->type) {
 				case MnValidatorRule::TYPE_STRING:
@@ -328,11 +378,30 @@ class MnValidatorRule {
 				case MnValidatorRule::TYPE_NUMBER:
 					return $this->checkNumber($name, $values[$name]);
 					break;
+
+				case MnValidatorRule::TYPE_ARRAY:
+					return $this->checkArray($name, $values[$name]);
+					break;
 			}
 		} else if($this->required) {
 			throw new MnException("Error : required value '" . $name . "' not defined", 400);
 		}
+
+		// Default values
+		switch ($this->type) {
+			case MnValidatorRule::TYPE_STRING:
+				return NULL;
+
+			case MnValidatorRule::TYPE_BOOL:
+				return false;
+
+			case MnValidatorRule::TYPE_NUMBER:
+				return 0;
+
+			case MnValidatorRule::TYPE_ARRAY:
+				return [];
+		}
 	}
 }
 
-?>	
+?>
