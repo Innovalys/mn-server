@@ -22,7 +22,7 @@ function CreateUser($context) {
 
 	$query->execute($user);
     $user['id'] = $db->lastInsertId();
-    $user['credentials'] = ['user'];
+    $user['credentials'] = MnUser::USER;
 
 	return $user;
 }

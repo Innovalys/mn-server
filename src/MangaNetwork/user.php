@@ -14,6 +14,10 @@ class MnUser {
 	public $pass;
 	public $credentials;
 
+	const NONE = 0b00;
+	const USER = 0b01;
+	const ADMIN = 0b10;
+	
 	/**
 	 * Manga network user constructor
 	 */

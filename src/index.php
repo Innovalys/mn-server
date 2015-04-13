@@ -18,28 +18,21 @@ include_once 'MangaNetwork/action/manga/get.php';
 session_start();
 
 try {
-
 	// Request context
 	$context = new MnContext();
 
 	// Router definition
 	$router = new MnActionRouter();
-	$router->addRule(new MnActionRule("/\/test_rest\/user\/?$/", "PUT", [], [], function($context) {
+	$router->addRule(new MnActionRule("/\/test_rest\/user\/?$/", "PUT", MnUser::NONE, [], function($context) {
 		render(CreateUser($context));
 	}));
-	$router->addRule(new MnActionRule("/\/test_rest\/user\/([^\/]+)/", "GET", [], ["id"], function($context) {
+	$router->addRule(new MnActionRule("/\/test_rest\/user\/([^\/]+)/", "GET", MnUser::NONE, ["id"], function($context) {
 		render(GetUser($context));
 	}));
-	$router->addRule(new MnActionRule("/\/test_rest\/user\/manga\/?$/", "PUT", [/*"user"*/], [], function($context) {
+	$router->addRule(new MnActionRule("/\/test_rest\/user\/manga\/?$/", "PUT", MnUser::USER, [], function($context) {
 		render(AddMangaToUser($context));
 	}));
-	$router->addRule(new MnActionRule("/\/test_rest\/test\/?$/", "GET", [], [], function($context) {
-		render([ "hello" => "world" ]);
-	}));
-	$router->addRule(new MnActionRule("/\/test_rest\/test\/([^\/]+)\/?$/", "GET", [], ["id"], function($context) {
-		render([ "hello" => "world", "from" => $context->uri, "id" => $context->params["id"] ]);
-	}));
-	$router->addRule(new MnActionRule("/\/test_rest\/manga\/([^\/]+)/", "GET", [], ["id"], function($context) {
+	$router->addRule(new MnActionRule("/\/test_rest\/manga\/([^\/]+)/", "GET", MnUser::NONE, ["id"], function($context) {
 		render(GetManga($context));
 	}));
 

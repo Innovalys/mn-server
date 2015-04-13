@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `manga-network`.`user` (
   `password` VARCHAR(45) NOT NULL,
   `mail` VARCHAR(45) NOT NULL,
   `name` VARCHAR(45) NULL,
-  `admin` TINYINT(1) NOT NULL,
+  `credentials` TINYINT(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 

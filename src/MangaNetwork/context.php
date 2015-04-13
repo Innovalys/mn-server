@@ -38,13 +38,45 @@ class MnContext {
 
 		if ($this->params["request_content"] === null && json_last_error() !== JSON_ERROR_NONE) {
 		    throw new MnException("Error : malformed JSON content", 400);
-		    
 		}
 
 		$this->method = $_SERVER['REQUEST_METHOD'];
 		$this->uri = $_SERVER['REQUEST_URI'];
-		$this->user = isset($_SESSION['USER']) ? $_SESSION['USER'] : null;
+
+		if (empty($_SERVER['HTTP_AUTHORIZATION']) == false)
+			$this->user = authenticateUser($_SERVER['HTTP_AUTHORIZATION']);
+		else
+			$this->user = null;
 	}
+}
+
+function authenticateUser($auth) {
+
+	$auth = sscanf($auth, "Basic %s");
+
+	if ($auth == null)
+		throw new MnException("Error: malformed authorization header", 400);
+		
+	$decoded = base64_decode($auth[0]);
+	$exploded = explode(":", $decoded);
+
+	if ($exploded == null || empty($exploded[0]) || empty($exploded[1]))
+		throw new MnException("Error: couldn't parse login:password ", 400);
+
+	$db = GetDBConnection();
+	
+	$query = $db->prepare("SELECT *
+							FROM user
+							WHERE login = ?
+							AND password = ?");
+
+	$response = $query->execute($exploded);
+	$user = $query->fetch(PDO::FETCH_ASSOC);
+
+	if ($user == false)
+		throw new MnException("Error: unknown login/password", 400);
+
+	return MnUser::initFrom($user);
 }
 
 ?>
