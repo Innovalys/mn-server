@@ -14,11 +14,13 @@ class MnManga {
 	public $description;
 	public $cover;
 	public $authors;
+	public $genres;
 
 	/**
 	 * Manga network manga constructor
 	 */
-	function __construct($id, $title, $chapter_nb, $source_API, $source_URL, $source_ID, $update_date, $release_date, $completed, $description, $cover, $authors) {
+	function __construct($id, $title, $chapter_nb, $source_API, $source_URL, $source_ID, $update_date,
+		                 $release_date, $completed, $description, $cover, $authors, $genres) {
 		$this->id = $id;
 		$this->title = $title;
 		$this->chapter_nb = $chapter_nb;
@@ -29,8 +31,9 @@ class MnManga {
 		$this->release_date = $release_date;
 		$this->completed = $completed;
         $this->description = $description;
-        $this->authors = $authors;
         $this->cover = $cover;
+        $this->authors = $authors;
+        $this->genres = $genres;
 	}
 
 	/**
@@ -41,7 +44,8 @@ class MnManga {
 	static function initFrom($data) {
 		return new MnManga($data['id'], $data['title'], $data['chapter_nb'], $data['source_API'],
 			               $data['source_URL'], $data['source_ID'], $data['update_date'],
-			               $data['release_date'], $data['completed'], $data['description'], $data['cover'], $data['authors']);
+			               $data['release_date'], $data['completed'], $data['description'], 
+			               $data['cover'], $data['authors'], $data['genres']);
 	}
 }
 

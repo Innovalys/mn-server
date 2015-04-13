@@ -30,7 +30,7 @@ try {
 	$router->addRule(new MnActionRule("/\/test_rest\/user\/([^\/]+)/", "GET", [], ["id"], function($context) {
 		render(GetUser($context));
 	}));
-	$router->addRule(new MnActionRule("/\/test_rest\/user\/([^\/]+)\/manga\/?$/", "PUT", [], ["id"], function($context) {
+	$router->addRule(new MnActionRule("/\/test_rest\/user\/manga\/?$/", "PUT", [/*"user"*/], [], function($context) {
 		render(AddMangaToUser($context));
 	}));
 	$router->addRule(new MnActionRule("/\/test_rest\/test\/?$/", "GET", [], [], function($context) {
