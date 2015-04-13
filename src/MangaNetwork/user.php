@@ -9,10 +9,10 @@
 */
 class MnUser {
 
-	private $id;
-	private $login;
-	private $pass;
-	private $credentials;
+	public $id;
+	public $login;
+	public $pass;
+	public $credentials;
 
 	/**
 	 * Manga network user constructor
@@ -24,13 +24,8 @@ class MnUser {
 		$this->credentials = $credentials;
 	}
 
-	/**
-	 * Return the users's credentials
-	 *
-	 * @return string[] The user's credentials
-	 */
-	function getCredentials() {
-		return $this->credentials;
+	static function initFrom($data) {
+		return new MnUser($data['id'], $data['login'], $data['password'], $data['credentials']);
 	}
 }
 

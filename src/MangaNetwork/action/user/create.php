@@ -21,10 +21,10 @@ function CreateUser($context) {
 							VALUES (:login, :password, :mail, :name)");
 
 	$query->execute($user);
-    $user['id'] = $db->lastInsertId(); 
+    $user['id'] = $db->lastInsertId();
+    $user['credentials'] = ['user'];
 
 	return $user;
-
 }
 
 ?>

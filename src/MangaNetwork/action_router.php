@@ -80,7 +80,7 @@ class MnActionRule {
 			if(!empty($this->credentials))
 				return false;
 		} else {
-			if(!in_array($this->credentials, $context->user->getCredentials()))
+			if(array_diff($this->credentials, $context->user->credentials))
 				return false;
 		}
 
