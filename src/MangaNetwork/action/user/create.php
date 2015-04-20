@@ -27,7 +27,7 @@ function checkUser($user) {
 	$login_regex = "/^[\w_\-]+$/m";
 
 	// Check missings fields
-	if (isset($user['mail']) == false)
+		if (isset($user['mail']) == false)
 		throw new MnException("Missing user field: [mail]", 400);
 		
 	if (isset($user['login']) == false)
