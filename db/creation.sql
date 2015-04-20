@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `manga-network`.`user` (
   `password` VARCHAR(45) NOT NULL,
   `mail` VARCHAR(45) NOT NULL,
   `name` VARCHAR(45) NULL,
-  `admin` TINYINT(1) NOT NULL,
+  `credentials` TINYINT(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -37,8 +37,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `manga-network`.`manga` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(45) NULL,
-  `page_nb` INT NULL,
-  `page` INT NULL,
+  `chapter_nb` INT NULL,
   `source_API` VARCHAR(45) NOT NULL,
   `source_URL` VARCHAR(255) NOT NULL,
   `source_ID` INT NOT NULL,
@@ -46,6 +45,7 @@ CREATE TABLE IF NOT EXISTS `manga-network`.`manga` (
   `release_date` DATETIME NULL,
   `completed` TINYINT(1) NULL,
   `description` TEXT NULL,
+  `cover` VARCHAR(255) NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
@@ -73,10 +73,12 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `manga-network`.`manga_chapter` (
   `id` INT NOT NULL AUTO_INCREMENT,
+  `source_ID` VARCHAR(255) NULL,
   `page_start` INT NULL,
   `page_nb` INT NULL,
   `title` VARCHAR(45) NULL,
   `manga_id` INT NOT NULL,
+  `loaded` TINYINT(1) NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_manga_chapter_manga1_idx` (`manga_id` ASC),
   CONSTRAINT `fk_manga_chapter_manga1`

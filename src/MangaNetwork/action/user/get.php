@@ -9,7 +9,7 @@ function GetUser($context) {
 
 	$db = GetDBConnection();
 	
-	$query = $db->prepare("SELECT id, mail, name, admin
+	$query = $db->prepare("SELECT id, mail, name, credentials
 							FROM user
 							WHERE id = ?");
 

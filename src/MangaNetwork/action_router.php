@@ -42,8 +42,8 @@ class MnActionRule {
 	 * @param string $regex The regex that should match the URI. Capturing groups used here could be
 	 * retrieved by providing capture group entry
 	 * @param string $method The HTTP method that can be used for this rule (get|post|put|delete)
-	 * @param string[] $credentials The list of credentials needed to display the page. An empty
-	 * array means no credentials are needed
+	 * @param int $credentials A bitfield describing the credentials needed to display the page. 
+	 * MnUser::None means no credentials are needed
 	 * @param string[] $captureGroups The list of groups to be captured in the regex URI
 	 * @param callable $action Action to be performed when the rule match. This action can have an optional
 	 * argument which is the request's context
@@ -76,18 +76,17 @@ class MnActionRule {
 			return false;
 
 		// Test credentials
-		if($context->user == NULL) {
-			if(!empty($this->credentials))
+		if ($this->credentials != MnUser::NONE) {
+			if ($context->user == null)
 				return false;
-		} else {
-			if(!in_array($this->credentials, $context->user->getCredentials()))
+			else if ($this->credentials != ($this->credentials & $context->user->credentials))
 				return false;
 		}
 
 		// Set the capturing groups elements
 		array_shift($data);
 		foreach ($this->captureGroups as $captureGroup) {
-			if(empty($data)) // In case more capture group where provided
+			if (empty($data)) // In case more capture group where provided
 				break;
 
 			$context->params[$captureGroup] = array_shift($data);

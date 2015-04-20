@@ -16,12 +16,10 @@ function GetManga($context) {
 	$response = $query->execute([$data]);
 	$response = $query->fetch(PDO::FETCH_ASSOC);
 
-	if($response==NULL)
-	{
-	
+	if($response == NULL) {
 		throw new MnException("Error : no manga with ID : ".$data, 404);
-	
 	}
+
 	return $response;
 }
 
