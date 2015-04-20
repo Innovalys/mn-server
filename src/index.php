@@ -35,6 +35,9 @@ try {
 	$router->addRule(new MnActionRule("/\/test_rest\/manga\/([^\/]+)/", "GET", MnUser::NONE, ["id"], function($context) {
 		render(GetManga($context));
 	}));
+	$router->addRule(new MnActionRule("/\/search\/manga\//", "GET", [], [], function($context) {
+		render(searchManga($context));
+	}));
 
 	// Dispatch
 	$router->route($context);
