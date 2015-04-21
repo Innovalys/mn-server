@@ -6,34 +6,32 @@ include_once 'MangaNetwork/manga.php';
 /**
  * Get a manga. If the manga is not in the database, the function will try to get the manga
  * from the provided API/source couples
- * @param  string $api    The API to use
- * @param  string $source The API source to use
- * @param  string $id     The manga ID from the API
+ * @param  string $manga_info     The manga informations from the API
  * @return \MnManga       The retreived manga
  */
-function getManga($api, $source, $id) {
-	$manga = getMangaFromDatabase($api, $source, $id);
+function getManga($manga_info) {
+	$manga = getMangaFromDatabase($manga_info['api'], $manga_info['source'], $manga_info['id']);
 
 	if(!$manga) {
-		switch (strtolower($api)) {
+		switch (strtolower($manga_info['api'])) {
 			case 'mangascrapper':
-				if(strtolower($source) == "mangafox.me" OR strtolower($source) == "mangareader.net") {
+				if(strtolower($manga_info['source']) == "mangafox.me" OR strtolower($manga_info['source']) == "mangareader.net") {
 					$manga = getMangaFromMangaScrapper($manga_info);
 				} else {
-					throw new MnException("Error : unknow source '" . $source . "' to use with 'MangaScrapper'", 400);
+					throw new MnException("Error : unknow source '" . $manga_info['source'] . "' to use with 'MangaScrapper'", 400);
 				}
 				break;
 
 			case 'mangaeden':
-				if(strtolower($source) == "www.mangaeden.com") {
+				if(strtolower($manga_info['source']) == "www.mangaeden.com") {
 					$manga = getMangaFromMangaEden($manga_info);
 				} else {
-					throw new MnException("Error : unknow source '" . $source . "' to use with 'MangaEden'", 400);
+					throw new MnException("Error : unknow source '" . $manga_info['source'] . "' to use with 'MangaEden'", 400);
 				}
 				break;
 			
 			default:
-				throw new MnException("Error : unknow API '" . $source . "' to use", 400);
+				throw new MnException("Error : unknow API '" . $manga_info['source'] . "' to use", 400);
 		}
 	}
 
@@ -56,7 +54,7 @@ function getMangaFromDatabase($api, $source, $id, $throw_on_null=false) {
 	// Get manga
 	$query = $db->prepare("SELECT * FROM manga 
 		                   WHERE source_API = :api AND source_URL = :source AND source_ID = :id");
-	$query->execute(['api' => $api, 'source_URL' => $source, 'source_ID' => $id]);
+	$query->execute(['api' => $api, 'source' => $source, 'id' => $id]);
 
 	$data = $query->fetch(PDO::FETCH_ASSOC);
 

@@ -20,7 +20,7 @@ function GetMangaAPI($context) {
 	$manga_info = $validator->getValidatedValues();
 
 	// Get manga
-	return getManga($manga_info['api'], $manga_info['source'], $manga_info['id']);
+	return getManga($manga_info);
 }
 
 ?>
