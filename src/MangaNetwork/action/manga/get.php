@@ -1,26 +1,26 @@
-<?php 
+<?php
 
-include_once 'MangaNetwork/manga.php';
+include_once 'MangaNetwork/user.php';
+include_once 'MangaNetwork/validator.php';
 include_once 'MangaNetwork/utils.php';
 
-function GetManga($context) {
+include_once 'MangaNetwork/action/manga/utils.php';
 
-	$data = $context->params["id"];
+/**
+ * Add a manga to the connected user
+ * @param \MnContext $context The request context
+ */
+function GetMangaAPI($context) {
 
-	$db = GetDBConnection();
-	
-	$query = $db->prepare("SELECT *
-							FROM manga
-							WHERE id = ?");
+	$validator = new MnValidator();
+	$validator->addRule("api",    MnValidatorRule::requiredString());
+	$validator->addRule("source", MnValidatorRule::requiredString());
+	$validator->addRule("id",     MnValidatorRule::requiredString());
+	$validator->validate($context->params["request_content"]);
+	$manga_info = $validator->getValidatedValues();
 
-	$response = $query->execute([$data]);
-	$response = $query->fetch(PDO::FETCH_ASSOC);
-
-	if($response == NULL) {
-		throw new MnException("Error : no manga with ID : ".$data, 404);
-	}
-
-	return $response;
+	// Get manga
+	return getManga($manga_info['api'], $manga_info['source'], $manga_info['id']);
 }
 
 ?>
