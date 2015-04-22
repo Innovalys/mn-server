@@ -10,17 +10,10 @@ include_once 'MangaNetwork/action/manga/utils.php';
  * Add a manga to the connected user
  * @param \MnContext $context The request context
  */
-function AddMangaToUser($context) {
-
-	$validator = new MnValidator();
-	$validator->addRule("api",    MnValidatorRule::requiredString());
-	$validator->addRule("source", MnValidatorRule::requiredString());
-	$validator->addRule("id",     MnValidatorRule::requiredString());
-	$validator->validate($context->params["request_content"]);
-	$manga_info = $validator->getValidatedValues();
+function AddMangaToUserAPI($context) {
 
 	// Get manga
-	$manga = getManga($manga_info);
+	$manga = getManga(['source' => $context->params['source'], 'id' => $context->params['id']]);
 
 	// Add manga
 	$db = GetDBConnection();

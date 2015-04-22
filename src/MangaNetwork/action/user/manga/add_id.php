@@ -10,7 +10,7 @@ include_once 'MangaNetwork/action/manga/utils.php';
  * Add a manga to the connected user
  * @param \MnContext $context The request context
  */
-function AddMangaByIdToUser($context) {
+function AddMangaToUserID($context) {
 
 	// Get manga
 	$manga = getMangaFromDatabaseByID($context->params['id'], true);

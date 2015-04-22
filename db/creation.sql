@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `manga-network`.`manga_chapter` (
   `page_nb` INT NULL,
   `title` VARCHAR(45) NULL,
   `manga_id` INT NOT NULL,
-  `loaded` TINYINT(1) NULL,
+  `loaded` TINYINT(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   INDEX `fk_manga_chapter_manga1_idx` (`manga_id` ASC),
   CONSTRAINT `fk_manga_chapter_manga1`
