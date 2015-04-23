@@ -5,6 +5,7 @@
  */
 
 include_once 'MangaNetwork/user.php';
+include_once 'MangaNetwork/action/search/search.php';
 include_once 'MangaNetwork/action/user/create.php';
 include_once 'MangaNetwork/action/user/get.php';
 include_once 'MangaNetwork/action/user/add_manga.php';
@@ -35,8 +36,8 @@ try {
 	$router->addRule(new MnActionRule("/\/test_rest\/manga\/([^\/]+)/", "GET", MnUser::NONE, ["id"], function($context) {
 		render(GetManga($context));
 	}));
-	$router->addRule(new MnActionRule("/\/search\/manga\//", "GET", [], [], function($context) {
-		render(searchManga($context));
+	$router->addRule(new MnActionRule("/\/search\/([^\/]+)\/([^\/]+)\/?$/", "GET", MnUser::NONE, ["source","query"], function($context) {
+		render(SearchManga($context));
 	}));
 
 	// Dispatch

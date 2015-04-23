@@ -8,7 +8,7 @@ function GetDBConnection() {
 }
 
 function GetMashapeKey() {
-	return "3x4BIHw2TAmshhKqDFHbdB0oZIqqp1NKbLOjsnBCSOWKpapHEp";
+	return "HhfIVRaNifmshprSUa6pmLwUo0fvp14H42rjsn8WSeSTUrRW9W";
 }
 
 ?>
