@@ -7,9 +7,14 @@
  *  Get manga list of the user personnal library
  * @param \MnContext $context The request context
  */
-	function search_personnal_manga($user_info) {
+	function searchPersonnalManga($context) {
 
-		
+	$validator = new MnValidator();
+	$validator->addRule("id",     MnValidatorRule::requiredString());
+	$validator->validate($context->params["request_content"]);
+	$user_info = $validator->getValidatedValues();
+	
+	
 	$db = GetDBConnection();
 
 		// Get manga_id
