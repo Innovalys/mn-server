@@ -5,13 +5,13 @@
  */
 
 include_once 'MangaNetwork/user.php';
+include_once 'MangaNetwork/context.php';
 include_once 'MangaNetwork/renderer.php';
 include_once 'MangaNetwork/exception.php';
 include_once 'MangaNetwork/action_router.php';
-include_once 'MangaNetwork/context.php';
 
-include_once 'MangaNetwork/action/user/create.php';
 include_once 'MangaNetwork/action/user/get.php';
+include_once 'MangaNetwork/action/user/create.php';
 include_once 'MangaNetwork/action/user/manga/get.php';
 include_once 'MangaNetwork/action/user/manga/add.php';
 include_once 'MangaNetwork/action/user/manga/add_id.php';
@@ -20,6 +20,7 @@ include_once 'MangaNetwork/action/user/manga/chapter/get_id.php';
 
 include_once 'MangaNetwork/action/manga/get.php';
 include_once 'MangaNetwork/action/manga/get_id.php';
+include_once 'MangaNetwork/action/manga/search.php';
 include_once 'MangaNetwork/action/manga/chapter/get.php';
 include_once 'MangaNetwork/action/manga/chapter/get_id.php';
 
@@ -44,7 +45,10 @@ try {
 	}));
 
 	// == Manga actions ==
-	// Search TODO
+	// Search
+	$router->addRule(new MnActionRule("/mn-server\/manga\/search\/([^\/]+)\/([^\/]+)\/?$/", "GET", MnUser::NONE, ["source","query"], function($context) {
+		render(SearchManga($context));
+	}));
 	// Get chapter
 	$router->addRule(new MnActionRule("/mn-server\/manga\/((?!id).+)\/([^\/]+)\/([^\/]+)\/?$/", "GET", MnUser::USER, ['source', 'id', 'chapter_id'], function($context) {
 		render(GetMangaChapterAPI($context));

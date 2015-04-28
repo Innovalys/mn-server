@@ -29,21 +29,21 @@ function getMangaChapter($manga, $chapter_id) {
  * @param  string $chapter_id  The chapter id
  * @return MnChapter           The chapter
  */
-function getMangaChapterFromDatabase($manga, $chapter_id) {
+function getMangaChapterFromDatabase($manga, $nb) {
 	$db = GetDBConnection();
 
 	// Get id
-	if($chapter_id > sizeof($manga->getChapters()))
-		throw new MnException("Error : no chapter #".$chapter_id." in manga '" . $manga->title . "'", 404);
-	$chapter_id = $manga->getChapters()[$chapter_id];
+	if($nb > sizeof($manga->getChapters()))
+		throw new MnException("Error : no chapter #".$nb." in manga '" . $manga->title . "'", 404);
+	$chapter_id = $manga->getChapters()[$nb];
 
 	// Get chapters
 	$query = $db->prepare("SELECT * FROM manga_chapter WHERE id = ?");
-	$chapter = $query->execute([$chapter_id]);
+	$chapter = $query->execute([$chapter_id['id']]);
 	$chapter = $query->fetch(PDO::FETCH_ASSOC);
 
 	if($chapter == NULL) {
-		throw new MnException("Error : no chapter #".$chapter_id." in manga '" . $manga->title . "'", 404);
+		throw new MnException("Error : no chapter #".$nb." in manga '" . $manga->title . "'", 404);
 	}
 
 	$chapter = MnMangaChapter::initFrom($chapter);
@@ -121,7 +121,45 @@ function getMangaChapterFromMangaScrapper($manga, $chapter) {
  * @return MnMangaChapter          The completed manga chapter
  */
 function getMangaChapterFromMangaEden($manga, $chapter) {
-	// TODO
+
+	// Get chapter data from MangaScrapper
+	$curl = curl_init();
+	curl_setopt_array($curl, [
+	    CURLOPT_RETURNTRANSFER => 1,
+	    CURLOPT_SSL_VERIFYPEER => false,
+	    CURLOPT_URL => 'https://www.mangaeden.com/api/chapter/' . $chapter->source_ID . '/'
+	]);
+	$rawResponse = json_decode(curl_exec($curl), true);
+
+	try {
+		// Test for error
+		if(curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200)
+			throw new MnException("Error : error with '" . $manga->source_URL . "' : " . curl_getinfo($curl, CURLINFO_HTTP_CODE), 400);
+
+		// Test for error
+		if(isset($rawResponse['error']))
+			throw new MnException("Error : error with '" . $manga->source_URL . "' : " . $rawResponse['error'], 400);
+
+	} catch (Exception $e) {
+		throw $e;
+	} finally {
+		curl_close($curl);
+	}
+
+	// Validate data
+	$validator = new MnValidator();
+	$validator->addRule("images",       MnValidatorRule::optionalArray());
+	$validator->validate($rawResponse);
+	$chapter_data = $validator->getValidatedValues();
+
+	$chapter_data['name'] = $chapter->title;
+	$chapter_data['pages'] = [];
+
+	foreach ($chapter_data['images'] as $url) {
+		$chapter_data['pages'][] = ['url' => $url[1]];
+	}
+
+	return updateChapter($chapter, $chapter_data);
 }
 
 /**
@@ -144,10 +182,10 @@ function updateChapter($chapter, $chapter_data) {
 		$pages[] = ["page_nb" => $i++, "link" => $page['url']];
 	}
 
-	$query = $db->prepare("UPDATE manga_chapter SET manga_chapter.loaded = 1 WHERE manga_chapter.id = ?");
-	$query->execute([$chapter->id]);
+	$query = $db->prepare("UPDATE manga_chapter SET manga_chapter.loaded = 1, manga_chapter.page_nb = ? WHERE manga_chapter.id = ?");
+	$query->execute([$i - 1, $chapter->id]);
 
-
+	$chapter->page_nb = $i - 1;
 	$chapter->pages = $pages;
 
 	return $chapter;

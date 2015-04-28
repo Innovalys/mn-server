@@ -43,8 +43,8 @@ function guessAPIFromSource($source) {
 	switch (strtolower($source)) {
 		case 'mangafox.me' :
 		case 'mangareader.net' :
+		case 'mangastream.com' :
 			return "mangascrapper";
-		case 'www.mangaeden.com' :
 		case 'mangaeden.com' :
 			return 'mangaeden';
 		default :
@@ -128,7 +128,7 @@ function setMangaRelativeInfo($db, $data) {
 	$query = $db->prepare("SELECT manga_chapter.id, manga_chapter.title FROM manga_chapter
 		                   WHERE manga_chapter.manga_id = ?");
 	$query->execute([$data['id']]);
-	$data['chapters'] = $query->fetchAll(PDO::FETCH_COLUMN, 0);
+	$data['chapters'] = $query->fetchAll(PDO::FETCH_ASSOC);
 
 	return $data;
 }
@@ -202,6 +202,14 @@ function getMangaFromMangaScrapper($manga_info) {
 	$manga['release_date'] = $manga['release_date']->format('Y-m-d H:i:s');
 	$manga['update_date']  = $manga['update_date']->format('Y-m-d H:i:s');
 
+	for ($i=0; $i < sizeof($manga_data['chapters']); $i++) {
+		if(isset($manga_data['chapters'][$i]['name']))
+			$manga_data['chapters'][$i]["title"] = $manga_data['chapters'][$i]['name'];
+		else
+			$manga_data['chapters'][$i]["title"] = "Chapter " . ($i + 1);
+		$manga_data['chapters'][$i]["id"] = $manga_data['chapters'][$i]['chapterId'];
+	}
+
 	$manga_data['authors'] = array_unique(array_merge($manga_data['author'], $manga_data['artist']));
 
 	return createManga($manga, $manga_data);
@@ -266,7 +274,7 @@ function getMangaFromMangaEden($manga_info) {
 	$manga = [ 'title'        => $manga_data['title'],                                   // Title of the manga
 	           'chapter_nb'   => sizeof($manga_data['chapters']),                        // Number of chapters available
 	           'source_API'   => "MangaEden",                                            // Name of the API
-	           'source_URL'   => "www.mangaeden.com",                                    // Source URL
+	           'source_URL'   => "mangaeden.com",                                        // Source URL
 	           'source_ID'    => $manga_info['id'],                                      // Source ID
 	           'release_date' => (new DateTime())->setTimestamp($manga_data['created']), // Date of release, but MangaScrappe only provides the year
 	           'update_date'  => new DateTime(),                                         // Last edit : now
@@ -282,8 +290,8 @@ function getMangaFromMangaEden($manga_info) {
 	$manga_data['genres']  = $manga_data["categories"];
 
 	for ($i=0; $i < sizeof($manga_data['chapters']); $i++) { 
-		$manga_data['chapters'][$i]["name"] = $manga_data['chapters'][$i][2];
-		$manga_data['chapters'][$i]["chapterId"] = $manga_data['chapters'][$i][3];
+		$manga_data['chapters'][$i]["title"] = $manga_data['chapters'][$i][2];
+		$manga_data['chapters'][$i]["id"] = $manga_data['chapters'][$i][3];
 	}
 
 	return createManga($manga, $manga_data);
@@ -361,11 +369,12 @@ function createManga($manga, $manga_data) {
 	}
 
 	// Add all the chapters to the database
-	$i = 1;
-	foreach ($manga_data['chapters'] as $chapter) {
+	for($i = 0; $i < sizeof($manga_data['chapters']); $i++) {
+
 		$query = $db->prepare("INSERT INTO manga_chapter (manga_id, source_ID, title) VALUES (?, ?, ?)");
-		$query->execute([$manga->id, $chapter['chapterId'], (isset($chapter['name']) ? $chapter['name'] : "Chapter " . $i)]);
-		$i++;
+		$query->execute([$manga->id, $manga_data['chapters'][$i]['id'], (isset($manga_data['chapters'][$i]['title']) ? $manga_data['chapters'][$i]['title'] : "Chapter " . ($i + 1))]);
+		
+		$manga->setChapterId($i, $db->lastInsertId());
 	}
 
 	return $manga;

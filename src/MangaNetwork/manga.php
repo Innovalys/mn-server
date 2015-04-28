@@ -53,6 +53,10 @@ class MnManga {
 	function getChapters() {
 		return $this->chapters;
 	}
+
+	function setChapterId($i, $id) {
+		$this->chapters[$i]['id'] = $id;
+	}
 }
 
 /**
