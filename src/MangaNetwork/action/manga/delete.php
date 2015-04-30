@@ -5,17 +5,22 @@ include_once 'MangaNetwork/utils.php';
 
 function DeleteManga($context) {
 
-		$result = $context->params["request_content"];
-		$id=$result['id'];
+		//NO NEED $result = $context->params["request_content"];
 		
-	if(ExistManga($id)!=false)
+		$idManga=$result['id'];
+		$idUser=$context->user->id;
+		
+		//1ere verification :  voir si le manga appartient a l'utilisateur
+		//2ement : supprimer le "user has manga" du manga liée au user connecte
+	if(ExistManga($idUser,$idManga)!=false)
 	{
 		$db = GetDBConnection();
+		
 		$query = $db->prepare("DELETE *
 							FROM manga
-							WHERE id = ?");
+							WHERE user_id = ? and manga_id= ?");
 
-		$response = $query->execute([$id]);
+		$response = $query->execute([$idUser, $idManga ]);
 		$response = $query->fetch(PDO::FETCH_ASSOC);
 	}
 	else
@@ -25,13 +30,13 @@ function DeleteManga($context) {
 	return("Manga deleted with ID : ".$id); ;	
 }
 
-function ExistManga($id)
+function ExistManga($idUser, $idManga)
 {
 	$query = $db->prepare("SELECT *
-							FROM manga
-							WHERE id = ?");
+							FROM user_has_manga
+							WHERE user_id = ? and manga_id= ?");
 
-	$response = $query->execute([$id]);
+	$response = $query->execute([$idUser, $idManga]);
 	$response = $query->fetch(PDO::FETCH_ASSOC);
 	if($response==NULL){return false;}
 	return true;

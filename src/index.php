@@ -14,6 +14,7 @@ include_once 'MangaNetwork/action_router.php';
 include_once 'MangaNetwork/context.php';
 include_once 'MangaNetwork/action/manga/get.php';
 include_once 'MangaNetwork/action/manga/delete.php';
+include_once 'MangaNetwork/action/manga/update.php';
 
 
 
@@ -34,13 +35,20 @@ try {
 	$router->addRule(new MnActionRule("/\/test_rest\/user\/manga\/?$/", "PUT", MnUser::USER, [], function($context) {
 		render(AddMangaToUser($context));
 	}));
-	$router->addRule(new MnActionRule("/\/test_rest\/manga\/([^\/]+)/", "GET", MnUser::NONE, ["id"], function($context) {
+	$router->addRule(new MnActionRule("/\/test_rest\/user\/manga\/([^\/]+)/", "GET", MnUser::USER, ["id"], function($context) {
 		render(GetManga($context));
 	}));
 
-	$router->addRule(new MnActionRule("/\/test_rest\/manga\/?$/", "DELETE", [], [], function($context) {
+	$router->addRule(new MnActionRule("/\/test_rest\/manga\/([^\/]+)/", "DELETE", MnUser::USER, ["id"], function($context) {
 		render(DeleteManga($context));
-
+	}));
+	/*
+	UPDATE
+	*/
+	$router->addRule(new MnActionRule("/\/test_rest\/manga\/([^\/]+)/", "POST", MnUser::USER, ["id"], function($context) {
+		render(UpdateManga($context));
+		}));
+	
 	$router->addRule(new MnActionRule("/\/search\/manga\//", "GET", [], [], function($context) {
 		render(searchManga($context));
 
