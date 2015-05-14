@@ -18,7 +18,7 @@ function GetMangaAPI($context) {
 	return getManga($manga_info);
 }
 
-
+/*
 function GetManga($context) {
 	$idManga = $context->params["id"];
 	$idUser=$context->user->id;
@@ -42,7 +42,7 @@ function GetManga($context) {
 		throw new MnException("Error : no manga with ID : ".$idManga, 404);
 	}
 	return $response;
-}
+}*/
 
 function GetMangaGenre($idManga) {
 
