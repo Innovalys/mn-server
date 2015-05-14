@@ -15,6 +15,8 @@ include_once 'MangaNetwork/action/user/create.php';
 include_once 'MangaNetwork/action/user/manga/get.php';
 include_once 'MangaNetwork/action/user/manga/add.php';
 include_once 'MangaNetwork/action/user/manga/add_id.php';
+include_once 'MangaNetwork/action/user/manga/update.php';
+include_once 'MangaNetwork/action/user/manga/delete.php';
 include_once 'MangaNetwork/action/user/manga/chapter/get.php';
 include_once 'MangaNetwork/action/user/manga/chapter/get_id.php';
 
@@ -87,8 +89,14 @@ try {
 	$router->addRule(new MnActionRule("/mn-server\/user\/manga\/([^\/]+)\/?$/", "GET", MnUser::USER, ['id'], function($context) {
 		render(GetUserManga($context));
 	}));
-	// User manga delete TODO
-	// User manga updata TODO
+	// User manga delete
+	$router->addRule(new MnActionRule("/mn-server\/user\/manga\/([^\/]+)\/?$/", "DELETE", MnUser::USER, ['id'], function($context) {
+		render(DeleteManga($context));
+	}));
+	// User manga update
+	$router->addRule(new MnActionRule("/mn-server\/manga\/([^\/]+)/", "POST", MnUser::USER, ["id"], function($context) {
+		render(UpdateManga($context));
+	}));
 
 	// Dispatch
 	$router->route($context);
