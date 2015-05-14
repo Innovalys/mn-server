@@ -14,7 +14,7 @@ include_once 'MangaNetwork/exception.php';
 include_once 'MangaNetwork/action_router.php';
 include_once 'MangaNetwork/context.php';
 include_once 'MangaNetwork/action/manga/get.php';
-include_once 'MangaNetwork/action/search/search_personnal_manga.php';
+include_once 'MangaNetwork/action/user/search_personnal_manga.php';
 
 
 session_start();
@@ -44,7 +44,7 @@ try {
 		render(SearchManga($context));
 	}));
 
-	$router->addRule(new MnActionRule("/\/test_rest\/user\/mangaUser\/?$/", "GET", MnUser::NONE, [], function($context) {
+	$router->addRule(new MnActionRule("/mn-server\/user\/personalmanga\/?$/", "GET", MnUser::NONE, [], function($context) {
 		render(searchPersonnalManga($context));
 	}));
 	// Dispatch
