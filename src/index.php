@@ -44,7 +44,7 @@ try {
 		render(SearchManga($context));
 	}));
 
-	$router->addRule(new MnActionRule("/\/test_rest\/?$/", "GET", MnUser::NONE, [], function($context) {
+	$router->addRule(new MnActionRule("/\/test_rest\/user\/mangaUser\/?$/", "GET", MnUser::NONE, [], function($context) {
 		render(searchPersonnalManga($context));
 	}));
 	// Dispatch
