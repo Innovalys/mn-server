@@ -40,31 +40,13 @@ CREATE TABLE IF NOT EXISTS `manga-network`.`manga` (
   `chapter_nb` INT NULL,
   `source_API` VARCHAR(45) NOT NULL,
   `source_URL` VARCHAR(255) NOT NULL,
-  `source_ID` INT NOT NULL,
+  `source_ID` VARCHAR(45) NOT NULL,
   `update_date` DATETIME NULL,
   `release_date` DATETIME NULL,
   `completed` TINYINT(1) NULL,
   `description` TEXT NULL,
   `cover` VARCHAR(255) NULL,
   PRIMARY KEY (`id`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `manga-network`.`manga_page`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `manga-network`.`manga_page` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `page_nb` INT NULL,
-  `link` VARCHAR(512) NULL,
-  `manga_id` INT NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_manga_page_manga_idx` (`manga_id` ASC),
-  CONSTRAINT `fk_manga_page_manga`
-    FOREIGN KEY (`manga_id`)
-    REFERENCES `manga-network`.`manga` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -78,12 +60,30 @@ CREATE TABLE IF NOT EXISTS `manga-network`.`manga_chapter` (
   `page_nb` INT NULL,
   `title` VARCHAR(45) NULL,
   `manga_id` INT NOT NULL,
-  `loaded` TINYINT(1) NULL,
+  `loaded` TINYINT(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   INDEX `fk_manga_chapter_manga1_idx` (`manga_id` ASC),
   CONSTRAINT `fk_manga_chapter_manga1`
     FOREIGN KEY (`manga_id`)
     REFERENCES `manga-network`.`manga` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `manga-network`.`manga_page`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `manga-network`.`manga_page` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `page_nb` INT NULL,
+  `link` VARCHAR(512) NULL,
+  `manga_chapter_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_manga_page_manga_idx` (`manga_chapter_id` ASC),
+  CONSTRAINT `fk_manga_page_manga`
+    FOREIGN KEY (`manga_chapter_id`)
+    REFERENCES `manga-network`.`manga_chapter` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

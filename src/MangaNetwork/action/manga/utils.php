@@ -1,82 +1,116 @@
 <?php
 
-include_once 'MangaNetwork/user.php';
-include_once 'MangaNetwork/validator.php';
-include_once 'MangaNetwork/utils.php';
+include_once 'MangaNetwork/exception.php';
+include_once 'MangaNetwork/manga.php';
 
 /**
- * Add a manga to the connected user
- * @param \MnContext $context The request context
+ * Get a manga. If the manga is not in the database, the function will try to get the manga
+ * from the provided API/source couples
+ * @param  string $manga_info     The manga informations from the API
+ * @return \MnManga       The retreived manga
  */
-function AddMangaToUser($context) {
+function getManga($manga_info) {
 
-	$validator = new MnValidator();
-	$validator->addRule("api",    MnValidatorRule::requiredString());
-	$validator->addRule("source", MnValidatorRule::requiredString());
-	$validator->addRule("id",     MnValidatorRule::requiredString());
-	$validator->validate($context->params["request_content"]);
-	$manga_info = $validator->getValidatedValues();
+	$manga_info['api'] = guessAPIFromSource($manga_info['source']);
 
-	// Get manga
-	$manga = getMangaFromDatabase($manga_info);
+	// Get the manga from the database
+	$manga = getMangaFromDatabase($manga_info['api'], $manga_info['source'], $manga_info['id']);
 
 	if(!$manga) {
-		switch (strtolower($manga_info["api"])) {
+		switch ($manga_info['api']) {
 			case 'mangascrapper':
-				if(strtolower($manga_info["source"]) == "mangafox.me" OR
-				   strtolower($manga_info["source"]) == "mangareader.net") {
-					$manga = getMangaFromMangaScrapper($manga_info);
-				} else {
-					throw new MnException("Error : unknow source '" . $manga_info["source"] . "' to use with 'MangaScrapper'", 400);
-				}
-				break;
+				return getMangaFromMangaScrapper($manga_info);
 
 			case 'mangaeden':
-				if(strtolower($manga_info["source"]) == "www.mangaeden.com") {
-					$manga = getMangaFromMangaEden($manga_info);
-				} else {
-					throw new MnException("Error : unknow source '" . $manga_info["source"] . "' to use with 'MangaEden'", 400);
-				}
-				break;
+				return getMangaFromMangaEden($manga_info);
 			
 			default:
-				throw new MnException("Error : unknow API '" . $manga_info["api"] . "' to use", 400);
+				// Should not happen
+				throw new MnException("Error : unknow API '" . $manga_info['api'] . "", 404);
 		}
+	} else
+		return $manga;
+}
+
+/**
+ * Guess the API to use from the given source. This method can also be used as a failguard
+ * because it will thrown an exception if the source link don't refer to any known
+ * source
+ * @param  string $source The source
+ * @return string         The found API
+ */
+function guessAPIFromSource($source) {
+	switch (strtolower($source)) {
+		case 'mangafox.me' :
+		case 'mangareader.net' :
+		case 'mangastream.com' :
+			return "mangascrapper";
+		case 'mangaeden.com' :
+			return 'mangaeden';
+		default :
+			throw new MnException("Error : unknow source '" . $source . "'", 404);
 	}
-	
-	// Add manga
-	$db = GetDBConnection();
-	$query = $db->prepare("SELECT * FROM user_has_manga WHERE user_id = ? AND manga_id = ?");
-	$query->execute([$context->user->id, $manga->id]);
-	$data = $query->fetch(PDO::FETCH_ASSOC);
-
-	if($data)
-		throw new MnException("Error : user '" . $context->user->login . "' already have the manga '" . $manga->title . "' in its personnal library", 400);
-	
-	$query = $db->prepare("INSERT INTO user_has_manga (manga_id, user_id, update_date) VALUES (?, ?, ?)");
-	$query->execute([$manga->id, $context->user->id, (new DateTime())->format('Y-m-d H:i:s')]);
-
-	return $manga;
 }
 
 /**
  * Get a manga from tha database. If the manga is not in the database, false will be returned. Otherwise,
  * the manga will be return
- * @param  mixed[] $manga_info Array containing the API, URL and ID of the manga
+ * @param  string $api    The API to use
+ * @param  string $source The API source to use
+ * @param  string $id     The manga ID from the API
  * @return \MnManga             The found manga, or false
  */
-function getMangaFromDatabase($manga_info) {
+function getMangaFromDatabase($api, $source, $id, $throw_on_null=false) {
 
 	$db = GetDBConnection();
 
 	// Get manga
 	$query = $db->prepare("SELECT * FROM manga 
 		                   WHERE source_API = :api AND source_URL = :source AND source_ID = :id");
-	$query->execute($manga_info);
+	$query->execute(['api' => $api, 'source' => $source, 'id' => $id]);
 
 	$data = $query->fetch(PDO::FETCH_ASSOC);
-	if(!$data)
-		return false;
+
+	if(!$data) {
+		if($throw_on_null)
+			throw new MnException("Error : no manga in the database with the source_ID '" + $id + "' for API '" + $api + "'", 404);
+		else
+			return false;
+	}
+
+	return MnManga::initFrom(setMangaRelativeInfo($db, $data));
+}
+
+/**
+ * Get a manga from tha database. If the manga is not in the database, false will be returned. Otherwise,
+ * the manga will be return
+ * @param  string   $id   The manga unical ID
+ * @return \MnManga       The found manga, or false
+ */
+function getMangaFromDatabaseByID($id, $throw_on_null=false) {
+
+	$db = GetDBConnection();
+
+	// Get manga
+	$query = $db->prepare("SELECT * FROM manga WHERE id = :id");
+	$query->execute(['id' => $id]);
+
+	$data = $query->fetch(PDO::FETCH_ASSOC);
+
+	if(!$data) {
+		if($throw_on_null)
+			throw new MnException("Error : no manga in the database with the ID '" + $id + "'", 404);
+		else
+			return false;
+	}
+
+	return MnManga::initFrom(setMangaRelativeInfo($db, $data));
+}
+
+/**
+ * Set the manga relative info from the database
+ */
+function setMangaRelativeInfo($db, $data) {
 
 	// Get genre
 	$query = $db->prepare("SELECT genre.name FROM genre JOIN genre_has_manga
@@ -90,8 +124,15 @@ function getMangaFromDatabase($manga_info) {
 	$query->execute([$data['id']]);
 	$data['authors'] = $query->fetchAll(PDO::FETCH_COLUMN, 0);
 
-	return MnManga::initFrom($data);
+	// Get chapters
+	$query = $db->prepare("SELECT manga_chapter.id, manga_chapter.title FROM manga_chapter
+		                   WHERE manga_chapter.manga_id = ?");
+	$query->execute([$data['id']]);
+	$data['chapters'] = $query->fetchAll(PDO::FETCH_ASSOC);
+
+	return $data;
 }
+
 
 /**
  * Get a manga from MangaScrapper. Work with both sources
@@ -105,14 +146,28 @@ function getMangaFromMangaScrapper($manga_info) {
 	curl_setopt_array($curl, [
 	    CURLOPT_RETURNTRANSFER => 1,
 	    CURLOPT_SSL_VERIFYPEER => false,
+	    CURLOPT_HTTPHEADER => [
+	    	'X-Mashape-Key: ' . GetMashapeKey(),
+	    	'Accept: text/plain'
+	    ],
 	    CURLOPT_URL => 'https://doodle-manga-scraper.p.mashape.com/' . $manga_info['source'] . '/manga/' .  $manga_info['id'] . '/'
 	]);
 	$rawResponse = json_decode(curl_exec($curl), true);
-	curl_close($curl);
 
-	// Test for error
-	if(isset($rawResponse['error']))
-		throw new MnException("Error : error with MangaScrapper API '" . $rawResponse['error'] . "'", 400);
+	try {
+		// Test for error
+		if(curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200)
+			throw new MnException("Error : error with '" . $manga_info['source'] . "' : " . curl_getinfo($curl, CURLINFO_HTTP_CODE), 400);
+
+		// Test for error
+		if(isset($rawResponse['error']))
+			throw new MnException("Error : error with '" . $manga_info['source'] . "' : " . $rawResponse['error'], 400);
+
+	} catch (Exception $e) {
+		throw $e;
+	} finally {
+		curl_close($curl);
+	}
 
 	// Validate data
 	$validator = new MnValidator();
@@ -129,7 +184,7 @@ function getMangaFromMangaScrapper($manga_info) {
 	$manga_data = $validator->getValidatedValues();
 
 	if(!$manga_data['name'])
-		throw new MnException("Error : no manga could be retrieved with ID '" . $manga_info['id'] . "' on '" . $manga_info['source'] . "'", 404);
+		throw new MnException("Error : no manga could be retrieved with ID '" . $manga_info['id'] . "' on source '" . $manga_info['source'] . "'", 404);
 	
 	// Create the manga
 	$manga = [ 'title'        => $manga_data['name'],                                           // Title of the manga
@@ -147,10 +202,19 @@ function getMangaFromMangaScrapper($manga_info) {
 	$manga['release_date'] = $manga['release_date']->format('Y-m-d H:i:s');
 	$manga['update_date']  = $manga['update_date']->format('Y-m-d H:i:s');
 
+	for ($i=0; $i < sizeof($manga_data['chapters']); $i++) {
+		if(isset($manga_data['chapters'][$i]['name']))
+			$manga_data['chapters'][$i]["title"] = $manga_data['chapters'][$i]['name'];
+		else
+			$manga_data['chapters'][$i]["title"] = "Chapter " . ($i + 1);
+		$manga_data['chapters'][$i]["id"] = $manga_data['chapters'][$i]['chapterId'];
+	}
+
 	$manga_data['authors'] = array_unique(array_merge($manga_data['author'], $manga_data['artist']));
 
 	return createManga($manga, $manga_data);
 }
+
 
 /**
  * Get a manga from MangaEden
@@ -172,14 +236,20 @@ function getMangaFromMangaEden($manga_info) {
 	]);
 	$rawResponse = curl_exec($curl);
 
-	// Test for error
-	if(curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200) {
-		if(curl_getinfo($curl, CURLINFO_HTTP_CODE) == 404)
-			throw new MnException("Error : no manga could be retrieved with ID '" . $manga_info['id'] . "' on 'www.mangaeden.com'", 404);
-		throw new MnException("Error : error while retrieving manga ID '" . $manga_info['id'] . "' on 'www.mangaeden.com'", 400);
-	}
+	try {
+		// Test for error
+		if(curl_getinfo($curl, CURLINFO_HTTP_CODE) != 200)
+			throw new MnException("Error : error with '" . $manga_info['source'] . "' : " . curl_getinfo($curl, CURLINFO_HTTP_CODE), 400);
 
-	curl_close($curl);
+		// Test for error
+		if(isset($rawResponse['error']))
+			throw new MnException("Error : error with '" . $manga_info['source'] . "' : " . $rawResponse['error'], 400);
+
+	} catch (Exception $e) {
+		throw $e;
+	} finally {
+		curl_close($curl);
+	}
 
 	$rawResponse = json_decode($rawResponse, true);
 
@@ -197,11 +267,14 @@ function getMangaFromMangaEden($manga_info) {
 	$validator->validate($rawResponse);
 	$manga_data = $validator->getValidatedValues();
 
+	if(!$manga_data['title'])
+		throw new MnException("Error : no manga could be retrieved with ID '" . $manga_info['id'] . "' on source '" . $manga_info['source'] . "'", 404);
+	
 	// Create the manga
 	$manga = [ 'title'        => $manga_data['title'],                                   // Title of the manga
 	           'chapter_nb'   => sizeof($manga_data['chapters']),                        // Number of chapters available
 	           'source_API'   => "MangaEden",                                            // Name of the API
-	           'source_URL'   => "www.mangaeden.com",                                    // Source URL
+	           'source_URL'   => "mangaeden.com",                                        // Source URL
 	           'source_ID'    => $manga_info['id'],                                      // Source ID
 	           'release_date' => (new DateTime())->setTimestamp($manga_data['created']), // Date of release, but MangaScrappe only provides the year
 	           'update_date'  => new DateTime(),                                         // Last edit : now
@@ -217,12 +290,13 @@ function getMangaFromMangaEden($manga_info) {
 	$manga_data['genres']  = $manga_data["categories"];
 
 	for ($i=0; $i < sizeof($manga_data['chapters']); $i++) { 
-		$manga_data['chapters'][$i]["name"] = $manga_data['chapters'][$i][2];
-		$manga_data['chapters'][$i]["chapterId"] = $manga_data['chapters'][$i][3];
+		$manga_data['chapters'][$i]["title"] = $manga_data['chapters'][$i][2];
+		$manga_data['chapters'][$i]["id"] = $manga_data['chapters'][$i][3];
 	}
 
 	return createManga($manga, $manga_data);
 }
+
 
 /**
  * Create a manga in the database using the provided values
@@ -241,6 +315,7 @@ function createManga($manga, $manga_data) {
 	$manga['id'] = $db->lastInsertId();
 	$manga['authors'] = $manga_data['authors'];
 	$manga['genres'] = $manga_data['genres'];
+	$manga['chapters'] = $manga_data['chapters'];
 	$manga = MnManga::initFrom($manga);
 
 	// For each author/artist, check if they appear in the database, if not add them
@@ -294,11 +369,12 @@ function createManga($manga, $manga_data) {
 	}
 
 	// Add all the chapters to the database
-	$i = 1;
-	foreach ($manga_data['chapters'] as $chapter) {
+	for($i = 0; $i < sizeof($manga_data['chapters']); $i++) {
+
 		$query = $db->prepare("INSERT INTO manga_chapter (manga_id, source_ID, title) VALUES (?, ?, ?)");
-		$query->execute([$manga->id, $chapter['chapterId'], (isset($chapter['name']) ? $chapter['name'] : "Chapter " . $i)]);
-		$i++;
+		$query->execute([$manga->id, $manga_data['chapters'][$i]['id'], (isset($manga_data['chapters'][$i]['title']) ? $manga_data['chapters'][$i]['title'] : "Chapter " . ($i + 1))]);
+		
+		$manga->setChapterId($i, $db->lastInsertId());
 	}
 
 	return $manga;

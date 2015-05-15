@@ -40,11 +40,15 @@
 				    ],
 				    CURLOPT_URL => 'https://doodle-manga-scraper.p.mashape.com/'.$source.'/search?q='.$_query
 				]);
-				$rawResponse = json_decode(curl_exec($curl),true);
-				array_push($rep,$rawResponse[0]);
+				$rawResponses = json_decode(curl_exec($curl),true);
+
+				foreach($rawResponses as $rawResponse){
+					$rawResponse["source"] = $source;
+					array_push($rep,$rawResponse);
+				}
 			}
 
-		}else if($_source == "mangaeden"){
+		}else if($_source == "mangaeden.com"){
 			// Traitement MANGAEDEN
 			curl_setopt_array($curl, [
 			    CURLOPT_RETURNTRANSFER => 1,
@@ -97,14 +101,16 @@
     		"genres" 		=> array(),
     		"mangaImg" 		=> "",
 		);
-		if($_src == "mangaeden"){
+		if($_src == "mangaeden.com"){
 			foreach($_tabData as $manga){
-				$ligne["sourceID"] 	= $_src;
-				$ligne["mangaID"] 	= $manga["i"];
-				$ligne["mangaName"] = $manga["t"];
-				$ligne["genres"] 	= $manga["c"];
-				$ligne["mangaImg"] 	= $manga["im"];
-				array_push($allData,$ligne);
+				if($manga["i"]){
+					$ligne["sourceID"] 	= $_src;
+					$ligne["mangaID"] 	= $manga["i"];
+					$ligne["mangaName"] = $manga["t"];
+					$ligne["genres"] 	= $manga["c"];
+					$ligne["mangaImg"] 	= $manga["im"];
+					array_push($allData,$ligne);
+				}
 			}
 		}else if($_src == "mangafox.me" || $_src == "mangastream.com" || $_src == "mangareader.net"){
 				foreach($_tabData as $manga){
@@ -120,9 +126,10 @@
 				}
 		}else if($_src == "all"){
 			foreach($_tabData as $manga){
-				$ligne["sourceID"] 	= $_src;
+				
 				if(array_key_exists("genres",$manga)){
 					// MangaReader or MangaFox
+					$ligne["sourceID"] 	= $manga["source"];
 					$ligne["mangaID"] 	= $manga["mangaId"];
 					$ligne["mangaName"] = $manga["name"];
 					$ligne["genres"] 	= $manga["genres"];
@@ -130,6 +137,7 @@
 					array_push($allData,$ligne);
 				}else if(array_key_exists("name",$manga)){
 					// MangaStream
+					$ligne["sourceID"] 	= $manga["source"];
 					$ligne["mangaID"] 	= $manga["mangaId"];
 					$ligne["mangaName"] = $manga["name"];
 					$ligne["genres"] 	= array();
@@ -137,6 +145,7 @@
 					array_push($allData,$ligne);
 				}else if(array_key_exists("i",$manga)){
 					// MangaEden
+					$ligne["sourceID"] 	= "mangaeden.com";
 					$ligne["mangaID"] 	= $manga["i"];
 					$ligne["mangaName"] = $manga["t"];
 					$ligne["genres"] 	= $manga["c"];

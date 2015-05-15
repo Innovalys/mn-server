@@ -15,12 +15,13 @@ class MnManga {
 	public $cover;
 	public $authors;
 	public $genres;
+	private $chapters;
 
 	/**
 	 * Manga network manga constructor
 	 */
 	function __construct($id, $title, $chapter_nb, $source_API, $source_URL, $source_ID, $update_date,
-		                 $release_date, $completed, $description, $cover, $authors, $genres) {
+		                 $release_date, $completed, $description, $cover, $authors, $genres, $chapters) {
 		$this->id = $id;
 		$this->title = $title;
 		$this->chapter_nb = $chapter_nb;
@@ -34,6 +35,7 @@ class MnManga {
         $this->cover = $cover;
         $this->authors = $authors;
         $this->genres = $genres;
+        $this->chapters = $chapters;
 	}
 
 	/**
@@ -45,7 +47,15 @@ class MnManga {
 		return new MnManga($data['id'], $data['title'], $data['chapter_nb'], $data['source_API'],
 			               $data['source_URL'], $data['source_ID'], $data['update_date'],
 			               $data['release_date'], $data['completed'], $data['description'], 
-			               $data['cover'], $data['authors'], $data['genres']);
+			               $data['cover'], $data['authors'], $data['genres'], $data['chapters']);
+	}
+
+	function getChapters() {
+		return $this->chapters;
+	}
+
+	function setChapterId($i, $id) {
+		$this->chapters[$i]['id'] = $id;
 	}
 }
 
@@ -68,7 +78,7 @@ class MnMangaPage {
 	 * @return MnMangaPage The newly created manga page
 	 */
 	static function initFrom($data) {
-		return new MnMangaPage($data['page_nb'], $data['link']);
+		return new MnMangaPage($data['page_nb'] + 0, $data['link']);
 	}
 } 
 
@@ -79,14 +89,18 @@ class MnMangaChapter {
 
 	public $id;
 	public $title;
-	public $page_start;
 	public $page_nb;
+	public $source_ID;
+	public $pages;
+	private $loaded;
 
-	function __construct($id, $title, $page_start, $page_nb) {
+	function __construct($id, $title, $page_nb, $loaded, $source_ID) {
 		$this->id = $id;
 		$this->title = $title;
-		$this->page_start = $page_start;
 		$this->page_nb = $page_nb;
+		$this->loaded = $loaded;
+		$this->source_ID = $source_ID;
+		$this->pages = [];
 	}
 
 	/**
@@ -95,7 +109,11 @@ class MnMangaChapter {
 	 * @return MnMangaPage The newly created manga chapter
 	 */
 	static function initFrom($data) {
-		return new MnMangaChapter($data['id'], $data['title'], $data['page_start'], $data['page_nb']);
+		return new MnMangaChapter($data['id'], $data['title'], $data['page_nb'] + 0, $data['loaded'], $data['source_ID']);
+	}
+
+	function isLoaded() {
+		return $this->loaded;
 	}
 }
 
