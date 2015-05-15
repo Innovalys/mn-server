@@ -5,40 +5,39 @@ include_once 'MangaNetwork/utils.php';
 
 function DeleteManga($context) {
 
-		//NO NEED $result = $context->params["request_content"];
+	$idManga = $context->params['id'];
+	$user = $context->user;
 		
-		$idManga=$result['id'];
-		$idUser=$context->user->id;
-		
-		//1ere verification :  voir si le manga appartient a l'utilisateur
-		//2ement : supprimer le "user has manga" du manga liée au user connecte
-	if(ExistManga($idUser,$idManga)!=false)
-	{
+	if(ExistManga($user,$idManga)) {
 		$db = GetDBConnection();
 		
-		$query = $db->prepare("DELETE *
-							FROM manga
-							WHERE user_id = ? and manga_id= ?");
+		$query = $db->prepare("DELETE FROM user_has_manga
+							   WHERE user_id = ? AND manga_id= ?");
 
-		$response = $query->execute([$idUser, $idManga ]);
-		$response = $query->fetch(PDO::FETCH_ASSOC);
+		$response = $query->execute([$user->id, $idManga]);
+
+		if(!$response) {
+			throw new MnException("Error : unable to remove manga with ID : " . $idManga . " from user '" . $user->login . "' collection", 400);
+		}
+	} else {
+		throw new MnException("Error : no manga with ID : " . $idManga . " for user '" . $user->login . "'", 404);
 	}
-	else
-	{
-	throw new MnException("Error : no manga with ID : ".$id, 404);
-	}
-	return("Manga deleted with ID : ".$id); ;	
+
+	return("Manga with ID : " . $idManga . " deleted from user '" . $user->login . "' collection");
 }
 
-function ExistManga($idUser, $idManga)
-{
+function ExistManga($user, $idManga) {
+	$db = GetDBConnection();
 	$query = $db->prepare("SELECT *
-							FROM user_has_manga
-							WHERE user_id = ? and manga_id= ?");
+						   FROM user_has_manga
+						   WHERE user_id = ? AND manga_id= ?");
 
-	$response = $query->execute([$idUser, $idManga]);
+	$response = $query->execute([$user->id, $idManga]);
 	$response = $query->fetch(PDO::FETCH_ASSOC);
-	if($response==NULL){return false;}
+
+	if($response == NULL)
+		return false;
+
 	return true;
 }
 
