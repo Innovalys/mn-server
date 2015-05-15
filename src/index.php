@@ -17,7 +17,7 @@ include_once 'MangaNetwork/action/user/manga/add.php';
 include_once 'MangaNetwork/action/user/manga/add_id.php';
 include_once 'MangaNetwork/action/user/manga/update.php';
 include_once 'MangaNetwork/action/user/manga/delete.php';
-include_once 'MangaNetwork/action/user/manga/search.php';
+include_once 'MangaNetwork/action/user/manga/searchAllManga.php';
 include_once 'MangaNetwork/action/user/manga/chapter/get.php';
 include_once 'MangaNetwork/action/user/manga/chapter/get_id.php';
 include_once 'MangaNetwork/action/manga/get.php';
@@ -100,12 +100,10 @@ try {
 	}));
 	// User manga search
 	$router->addRule(new MnActionRule("/mn-server\/user\/search\/([^\/]+)\/?$/", "GET", MnUser::USER, ["id"], function($context) {
- 		render(SearchPersonnalManga($context));
+ 		render(SearchallPersonnalManga($context));
  	}));
 
-	$router->addRule(new MnActionRule("/mn-server\/user\/personalmanga\/?$/", "GET", MnUser::NONE, [], function($context) {
-		render(searchPersonnalManga($context));
-	}));
+
 	// Dispatch
 	$router->route($context);
 
