@@ -26,7 +26,7 @@ include_once 'MangaNetwork/action/manga/search.php';
 include_once 'MangaNetwork/action/manga/chapter/get.php';
 include_once 'MangaNetwork/action/manga/chapter/get_id.php';
 
-session_start();
+
 
 try {
 	// Request context
