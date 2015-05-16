@@ -99,11 +99,12 @@ try {
 	$router->addRule(new MnActionRule("/mn-server\/user\/manga\/([^\/]+)\/?$/", "POST", MnUser::USER, ["id"], function($context) {
 		render(UpdateManga($context));
 	}));
-	// User manga search
-	$router->addRule(new MnActionRule("/mn-server\/user\/search\/([^\/]+)\/?$/", "GET", MnUser::USER, ["id"], function($context) {
+	// User manga collection (all)
+	$router->addRule(new MnActionRule("/mn-server\/user\/mangas\/([^\/]+)\/?$/", "GET", MnUser::USER, ["id"], function($context) {
  		render(SearchallPersonnalManga($context));
  	}));
-	$router->addRule(new MnActionRule("/mn-server\/user\/search\/single\/([^\/]+)\/([^\/]+)\/?$/", "GET", MnUser::USER,['id','manga_name'], function($context) {
+	// User manga search
+	$router->addRule(new MnActionRule("/mn-server\/user\/search\/([^\/]+)\/([^\/]+)\/?$/", "GET", MnUser::USER,['id','manga_name'], function($context) {
  		render(SearchOnePersonnalManga($context));
  	}));
 

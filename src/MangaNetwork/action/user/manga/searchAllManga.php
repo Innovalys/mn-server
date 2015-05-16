@@ -20,18 +20,21 @@
 							   WHERE user_id = :id  ");
 		$query->execute($user_info);
 		$data = $query->fetch(PDO::FETCH_ASSOC);
+		
 		if(!$data)
-			return false;
+			return [];
+
 		// recupere les données des mangas
 		foreach($data as $idmanga){
 		
-			
 			$query = $db->prepare("SELECT * FROM manga 
-							   WHERE id = ?");
+							       WHERE id = ?");
 			$query->bindParam(1, $idmanga, PDO::PARAM_INT);
 			$query->execute();
 			$data = $query->fetch(PDO::FETCH_ASSOC);
-			if(!$data){return false;}
+
+			if(!$data)
+				return [];
 				
 			
 			// recupere genre
