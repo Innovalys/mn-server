@@ -331,7 +331,7 @@ class MnValidatorRule {
 		$val = $val + 0;
 
 		// Minimum value
-		if($this->minValue && $val > $this->minValue) {
+		if($this->minValue && !($val > $this->minValue)) {
 			if($this->required)
 				throw new MnException("Error : required number '" . $name . "' is too small", 400);
 			else
@@ -339,7 +339,7 @@ class MnValidatorRule {
 		}
 
 		// Maximum value
-		if($this->maxValue && $size < $this->maxValue) {
+		if($this->maxValue && !($val < $this->maxValue)) {
 			if($this->required)
 				throw new MnException("Error : required number '" . $name . "' is too big", 400);
 			else

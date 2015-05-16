@@ -6,59 +6,62 @@ include_once 'MangaNetwork/utils.php';
 function UpdateManga($context) {
 
 	$validator = new MnValidator();
-	$validator->addRule("favoris", MnValidatorRule::optinalBoolean());
-	$validator->addRule("page", MnValidatorRule::optinalNumber(0));
-	$validator->addRule("note", MnValidatorRule::optinalNumber(0, 5));
-	$validator->validate($context->params);
+
+	if(isset($context->params["request_content"]["favoris"]))
+		$validator->addRule("favoris", MnValidatorRule::optionalBoolean());
+
+	if(isset($context->params["request_content"]["page"]))
+		$validator->addRule("page", MnValidatorRule::optionalNumber(0));
+
+	if(isset($context->params["request_content"]["note"]))
+		$validator->addRule("note", MnValidatorRule::optionalNumber(0, 5));
+
+	$validator->validate($context->params["request_content"]);
 	$user_update = $validator->getValidatedValues();
 	
 	$db = GetDBConnection();
 
+	// Get the manga
+	$ret = false;
+	$manga = getUserMangaFromDatabaseById($context->params["id"], $context->user, true);
+
+	if(isset($user_update['favoris'])) {
+		$query = $db->prepare("UPDATE user_has_manga
+		                       SET favoris = ?
+		                       WHERE user_id = ? AND manga_id = ?");
+		$response = $query->execute([$user_update['favoris'] ? 1 : 0, $context->user->id, $manga->id]);
+
+		if(!$response)
+			throw new MnException("Error : sql error update favoris : ".$manga->id, 500);
 		
-	if($favoris != null) {
-		if($favoris==0 || $favoris==1) {
-			$query = $db->prepare("UPDATE user_has_manga
-			                       SET favoris = ?
-			                       WHERE user_id = ? AND manga_id = ?");
-			$response = $query->execute([$favoris, $idUser, $idManga]);
-			$response = $query->fetch(PDO::FETCH_ASSOC);
-
-			if($response == NULL) {
-				throw new MnException("Error : sql error update favoris : ".$idManga, 404);
-			}
-
-			return $response;
-		}
+		$ret = true;
 	}
 	
-	if($page != null) {
+	if(isset($user_update['page'])) {
 		$query = $db->prepare("UPDATE user_has_manga
 			                   SET page_cur = ?
 			                   WHERE user_id = ? AND manga_id = ?");
-		$response = $query->execute([$page, $idUser, $idManga]);
-		$response = $query->fetch(PDO::FETCH_ASSOC);
+		$response = $query->execute([$user_update['page'], $context->user->id, $manga->id]);
 
-		if($response == NULL) {
-			throw new MnException("Error : sql error update page_cur : ".$idManga, 404);
-		}
-
-		return $response;
+		if(!$response)
+			throw new MnException("Error : sql error update page_cur : ".$idManga, 500);
+	
+		$ret = true;
 	}
 	
-	if($note!=null) {
+	if(isset($user_update['note'])) {
 		$query = $db->prepare("UPDATE user_has_manga
 							   SET note = ?
 							   WHERE user_id = ? AND manga_id = ?");
-		$response = $query->execute([$note, $idUser, $idManga]);
-		$response = $query->fetch(PDO::FETCH_ASSOC);
+		$response = $query->execute([$user_update['note'], $context->user->id, $manga->id]);
 
-		if($response == NULL) {
-			throw new MnException("Error : sql error update note: ".$idManga, 404);
-		}
-
-		return $response;
-	}
+		if(!$response)
+			throw new MnException("Error : sql error update note: ".$idManga, 500);
 	
+		$ret = true;
+	}
+
+	return $ret;
 }
 
 ?>

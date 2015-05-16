@@ -89,7 +89,7 @@ try {
 	}));
 	// User manga get
 	$router->addRule(new MnActionRule("/mn-server\/user\/manga\/([^\/]+)\/?$/", "GET", MnUser::USER, ['id'], function($context) {
-		render(GetUserManga($context));
+		render(GetUserMangaFromDb($context));
 	}));
 	// User manga delete
 	$router->addRule(new MnActionRule("/mn-server\/user\/manga\/([^\/]+)\/?$/", "DELETE", MnUser::USER, ['id'], function($context) {

@@ -3,6 +3,23 @@
 include_once 'MangaNetwork/exception.php';
 include_once 'MangaNetwork/manga.php';
 
+function getUserManga($manga_info) {
+
+	//$manga_info['api'] = guessAPIFromSource($manga_info['source']);
+
+	// Get the manga from the database
+	//$manga = getUserMangaFromDatabase($manga_info['api'], $manga_info['source'], $manga_info['id']);
+
+	return NULL;
+}
+
+
+function getUserMangaByID($id, $throw_on_null=false) {
+
+	// Get the manga from the database
+	$manga = getUserMangaFromDatabaseById($manga_info['api'], $manga_info['source'], $manga_info['id']);
+}
+
 /**
  * Get a manga. If the manga is not in the database, the function will try to get the manga
  * from the provided API/source couples
@@ -50,6 +67,36 @@ function guessAPIFromSource($source) {
 		default :
 			throw new MnException("Error : unknow source '" . $source . "'", 404);
 	}
+}
+
+/**
+ * Get a manga from tha database from the user personnal library. If the manga is not in the database, 
+ * false will be returned. Otherwise, the manga will be return
+ * @param  string $id    The manga ID
+ * @param  string $user  The user
+ * @return \MnManga      The found manga, or false
+ */
+function getUserMangaFromDatabaseById($id, $user, $throw_on_null=false) {
+
+	$db = GetDBConnection();
+
+	// Get manga
+	$query = $db->prepare("SELECT * FROM manga
+						   INNER JOIN user_has_manga ON user_has_manga.manga_id = manga.id 
+						                             AND user_has_manga.user_id = :user_id
+						   WHERE manga.id = :id");
+	$query->execute(['id' => $id, 'user_id' => $user->id]);
+
+	$data = $query->fetch(PDO::FETCH_ASSOC);
+
+	if(!$data) {
+		if($throw_on_null)
+			throw new MnException("Error : no manga in the database with the ID '" . $id . "' in the user '" . $user->login . "' collection", 404);
+		else
+			return false;
+	}
+
+	return MnManga::initFrom(setMangaRelativeInfo($db, $data));
 }
 
 /**
