@@ -37,7 +37,6 @@ function SearchOnePersonnalManga($context) {
 		if(!$data2)
 			return [];
 			
-		
 		// recupere genre
 		$query = $db->prepare("SELECT genre.name FROM genre JOIN genre_has_manga
 							   WHERE genre_has_manga.manga_id = ? AND genre_has_manga.genre_id = genre.id");

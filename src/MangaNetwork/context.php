@@ -74,7 +74,7 @@ function authenticateUser($auth) {
 	$user = $query->fetch(PDO::FETCH_ASSOC);
 
 	if ($user == false)
-		throw new MnException("Error: unknown login/password", 400);
+		throw new MnException("Error: unknown login/password", 403);
 
 	return MnUser::initFrom($user);
 }

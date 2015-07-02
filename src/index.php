@@ -34,8 +34,6 @@ try {
 	$context = new MnContext();
 
 	// Router definition
-	
-	
 	$router = new MnActionRouter();
 
 	// == User endpoints ==
@@ -46,6 +44,10 @@ try {
 	// == User informations ==
 	$router->addRule(new MnActionRule("/mn-server\/user\/([^\/]+)\/?$/", "GET", MnUser::NONE, ['id'], function($context) {
 		render(GetUser($context));
+	}));
+	// == User informations ==
+	$router->addRule(new MnActionRule("/mn-server\/user\/?$/", "GET", MnUser::USER, [], function($context) {
+		render(GetConnectedUser($context));
 	}));
 
 	// == Manga actions ==

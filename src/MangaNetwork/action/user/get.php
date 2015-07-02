@@ -19,4 +19,7 @@ function GetUser($context) {
 	return $response;
 }
 
+function GetConnectedUser($context) {
+	return $context->user;
+}
 ?>

@@ -7,7 +7,7 @@
  *  Get manga list of the user personnal library
  * @param \MnContext $context The request context
  */
-	function SearchallPersonnalManga($context) {
+function SearchallPersonnalManga($context) {
 	$validator = new MnValidator();
 	$validator->addRule("id", MnValidatorRule::requiredString());
 	$validator->validate($context->params);
