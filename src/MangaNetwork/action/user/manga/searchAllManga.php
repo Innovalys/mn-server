@@ -13,29 +13,25 @@
 	$validator->validate($context->params);
 	$user_info = $validator->getValidatedValues();
 	
+	$values = [];
 	
 	$db = GetDBConnection();
 		// recupere les id des mangas
-		$query = $db->prepare("SELECT manga_id FROM user_has_manga 
-							   WHERE user_id = :id  ");
-		$query->execute($user_info);
-		$data = $query->fetch(PDO::FETCH_ASSOC);
-		
-		if(!$data)
-			return [];
+		$main_query = $db->prepare("SELECT manga_id, favoris, update_date, note, page_cur FROM user_has_manga WHERE user_id = :id");
+		$main_query->execute($user_info);
 
 		// recupere les données des mangas
-		foreach($data as $idmanga){
-		
-			$query = $db->prepare("SELECT * FROM manga 
-							       WHERE id = ?");
-			$query->bindParam(1, $idmanga, PDO::PARAM_INT);
+		while($data_user = $main_query->fetch(PDO::FETCH_ASSOC)){
+
+			$query = $db->prepare("SELECT * FROM manga WHERE id = ?");
+			$query->bindParam(1, $data_user["manga_id"], PDO::PARAM_INT);
 			$query->execute();
 			$data = $query->fetch(PDO::FETCH_ASSOC);
 
 			if(!$data)
 				return [];
-				
+
+			$data['user_info'] = $data_user;
 			
 			// recupere genre
 			$query = $db->prepare("SELECT genre.name FROM genre JOIN genre_has_manga
@@ -54,9 +50,9 @@
 			$data['chapters'] = $query->fetchAll(PDO::FETCH_COLUMN, 0);
 			
 			
-			$myArray[] = MnManga::initFrom($data);
+			$values[] = MnManga::initFrom($data);
 		}
 		
-		return $myArray ;
+		return $values ;
 }
 ?>
