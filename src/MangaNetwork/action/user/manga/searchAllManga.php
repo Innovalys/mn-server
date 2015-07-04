@@ -17,7 +17,7 @@ function SearchallPersonnalManga($context) {
 	
 	$db = GetDBConnection();
 		// recupere les id des mangas
-		$main_query = $db->prepare("SELECT manga_id, favoris, update_date, note, page_cur FROM user_has_manga WHERE user_id = :id");
+		$main_query = $db->prepare("SELECT * FROM user_has_manga WHERE user_id = :id");
 		$main_query->execute($user_info);
 
 		// recupere les données des mangas
