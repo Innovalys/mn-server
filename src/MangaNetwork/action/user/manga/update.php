@@ -13,6 +13,9 @@ function UpdateManga($context) {
 	if(isset($context->params["request_content"]["page"]))
 		$validator->addRule("page", MnValidatorRule::optionalNumber(0));
 
+	if(isset($context->params["request_content"]["chapter"]))
+		$validator->addRule("chapter", MnValidatorRule::optionalNumber(0));
+
 	if(isset($context->params["request_content"]["note"]))
 		$validator->addRule("note", MnValidatorRule::optionalNumber(0, 5));
 
@@ -45,6 +48,18 @@ function UpdateManga($context) {
 
 		if(!$response)
 			throw new MnException("Error : sql error update page_cur : ".$idManga, 500);
+	
+		$ret = true;
+	}
+	
+	if(isset($user_update['chapter'])) {
+		$query = $db->prepare("UPDATE user_has_manga
+			                   SET chapter_cur = ?
+			                   WHERE user_id = ? AND manga_id = ?");
+		$response = $query->execute([$user_update['chapter'], $context->user->id, $manga->id]);
+
+		if(!$response)
+			throw new MnException("Error : sql error update chapter_cur : ".$idManga, 500);
 	
 		$ret = true;
 	}

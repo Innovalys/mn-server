@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS `manga-network`.`user_has_manga` (
   `update_date` DATETIME NULL,
   `note` SMALLINT NULL,
   `page_cur` INT NULL,
+  `chapter_cur` INT NULL,
   PRIMARY KEY (`user_id`, `manga_id`),
   INDEX `fk_user_has_manga_manga1_idx` (`manga_id` ASC),
   INDEX `fk_user_has_manga_user1_idx` (`user_id` ASC),
