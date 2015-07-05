@@ -96,6 +96,14 @@ function getUserMangaFromDatabaseById($id, $user, $throw_on_null=false) {
 			return false;
 	}
 
+	// Prepare user infos
+	$data['user_info'] = [];
+	$data['user_info']['favoris'] = $data['favoris'];
+	$data['user_info']['update_date'] = $data['update_date'];
+	$data['user_info']['note'] = $data['note'];
+	$data['user_info']['page_cur'] = $data['page_cur'];
+	$data['user_info']['chapter_cur'] = $data['chapter_cur'];
+
 	return MnManga::initFrom(setMangaRelativeInfo($db, $data));
 }
 

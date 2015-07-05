@@ -9,11 +9,15 @@ function GetUserMangaChapterID($context) {
 	 
 	// Get manga
 	$manga = getMangaFromDatabaseByID($context->params['id'], true);
+	// Get chapter
+	$chapter = getMangaChapter($manga, $context->params['chapter_id']);
 
-	// TODO : check if mange is un user collection
+	if(!$chapter) {
+		
+	}
 
 	// Get chapter
-	return getMangaChapter($manga, $context->params['chapter_id']);
+	return $chapter;
 }
 
 ?>

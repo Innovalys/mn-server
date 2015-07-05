@@ -38,6 +38,14 @@ class MnManga {
         $this->genres = $genres;
         $this->chapters = $chapters;
         $this->user_info = $user_info;
+
+        if($this->user_info) {
+        	$this->user_info['chapter_cur'] = 0 + $this->user_info['chapter_cur'];
+        	$this->user_info['page_cur'] = 0 + $this->user_info['page_cur'];
+
+        	if($this->user_info['note'] != NULL)
+        		$this->user_info['note'] = 0 + $this->user_info['note'];
+        }
 	}
 
 	/**

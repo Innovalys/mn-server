@@ -33,9 +33,9 @@ function getMangaChapterFromDatabase($manga, $nb) {
 	$db = GetDBConnection();
 
 	// Get id
-	if($nb > sizeof($manga->getChapters()))
+	if($nb > sizeof($manga->getChapters()) OR $nb < 1)
 		throw new MnException("Error : no chapter #".$nb." in manga '" . $manga->title . "'", 404);
-	$chapter_id = $manga->getChapters()[$nb];
+	$chapter_id = $manga->getChapters()[$nb - 1];
 
 	// Get chapters
 	$query = $db->prepare("SELECT * FROM manga_chapter WHERE id = ?");
@@ -69,7 +69,7 @@ function getMangaChapterFromDatabase($manga, $nb) {
  * @return MnMangaChapter          The completed manga chapter
  */
 function getMangaChapterFromMangaScrapper($manga, $chapter) {
-
+	
 	// Get chapter data from MangaScrapper
 	$curl = curl_init();
 	curl_setopt_array($curl, [
@@ -109,7 +109,7 @@ function getMangaChapterFromMangaScrapper($manga, $chapter) {
 	//$chapter_data['lastUpdate'] = 
 
 	if(!$chapter_data['name'])
-		throw new MnException("Error : no manga chapter could be retrieved with ID '" . $chapter['source_ID'] . "'", 404);
+		throw new MnException("Error : no manga chapter could be retrieved with ID '" . $chapter->source_ID . "'", 404);
 
 	return updateChapter($chapter, $chapter_data);
 }

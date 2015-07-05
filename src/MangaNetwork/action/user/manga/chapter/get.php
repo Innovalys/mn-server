@@ -12,7 +12,7 @@ function GetUserMangaChapterAPI($context) {
 	// Get manga
 	$manga = getManga($manga_info);
 
-	// TODO : check if mange is un user collection
+	// TODO : check if manga is un user collection
 
 	// Get chapter
 	return getMangaChapter($manga, $context->params['chapter_id']);
