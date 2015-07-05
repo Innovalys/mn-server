@@ -47,7 +47,7 @@ function SearchallPersonnalManga($context) {
 			$query = $db->prepare("SELECT manga_chapter.id, manga_chapter.title  FROM manga_chapter 
 								   WHERE manga_chapter.manga_id = ?");
 			$query->execute([$data['id']]);
-			$data['chapters'] = $query->fetchAll(PDO::FETCH_COLUMN, 0);
+			$data['chapters'] = $query->fetchAll(PDO::FETCH_ASSOC);
 			
 			
 			$values[] = MnManga::initFrom($data);

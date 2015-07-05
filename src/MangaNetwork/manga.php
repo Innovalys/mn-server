@@ -15,7 +15,7 @@ class MnManga {
 	public $cover;
 	public $authors;
 	public $genres;
-	private $chapters;
+	public $chapters;
 	public $user_info;
 
 	/**
@@ -45,6 +45,12 @@ class MnManga {
 
         	if($this->user_info['note'] != NULL)
         		$this->user_info['note'] = 0 + $this->user_info['note'];
+        }
+
+        if($this->chapters) {
+        	for($i = 0; $i < count($this->chapters); $i++) {
+        		$this->chapters[$i]['nb'] = $i + 1;
+        	}
         }
 	}
 
