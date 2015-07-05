@@ -95,29 +95,32 @@
 		$allData = array();
 		
 		$ligne = array(
-    		"sourceID"		=> "",
-    		"mangaID"		=> "",
-    		"mangaName" 	=> "",
+    		"source_API"	=> "",
+    		"source_ID"		=> "",
+    		"source_URL"	=> "",
+    		"title" 	    => "",
     		"genres" 		=> array(),
-    		"mangaImg" 		=> "",
+    		"cover" 		=> "",
 		);
 		if($_src == "mangaeden.com"){
 			foreach($_tabData as $manga){
 				if($manga["i"]){
-					$ligne["sourceID"] 	= $_src;
-					$ligne["mangaID"] 	= $manga["i"];
-					$ligne["mangaName"] = $manga["t"];
-					$ligne["genres"] 	= $manga["c"];
-					$ligne["mangaImg"] 	= $manga["im"];
+					$ligne["source_API"] = "mangaeden";
+					$ligne["source_URL"] = $_src;
+					$ligne["source_ID"]  = $manga["i"];
+					$ligne["title"]      = $manga["t"];
+					$ligne["genres"] 	 = $manga["c"];
+					$ligne["cover"]      = $manga["im"];
 					array_push($allData,$ligne);
 				}
 			}
 		}else if($_src == "mangafox.me" || $_src == "mangastream.com" || $_src == "mangareader.net"){
 				foreach($_tabData as $manga){
 					foreach($manga as $currmanga){
-						$ligne["sourceID"] 	= $_src;
-						$ligne["mangaID"] 	= $currmanga["mangaId"];
-						$ligne["mangaName"] = $currmanga["name"];
+						$ligne["source_API"] = $_src;
+						$ligne["source_URL"] = $_src;
+						$ligne["source_ID"]  = $currmanga["mangaId"];
+						$ligne["title"]  = $currmanga["name"];
 						if(array_key_exists("genres",$currmanga)){
 							$ligne["genres"] 	= $currmanga["genres"];
 						}
@@ -129,27 +132,27 @@
 				
 				if(array_key_exists("genres",$manga)){
 					// MangaReader or MangaFox
-					$ligne["sourceID"] 	= $manga["source"];
-					$ligne["mangaID"] 	= $manga["mangaId"];
-					$ligne["mangaName"] = $manga["name"];
-					$ligne["genres"] 	= $manga["genres"];
-					$ligne["mangaImg"] 	= "";
+					$ligne["source_URL"] = $manga["source"];
+					$ligne["source_ID"]  = $manga["mangaId"];
+					$ligne["title"]      = $manga["name"];
+					$ligne["genres"] 	 = $manga["genres"];
+					$ligne["cover"] 	 = "";
 					array_push($allData,$ligne);
 				}else if(array_key_exists("name",$manga)){
 					// MangaStream
-					$ligne["sourceID"] 	= $manga["source"];
-					$ligne["mangaID"] 	= $manga["mangaId"];
-					$ligne["mangaName"] = $manga["name"];
-					$ligne["genres"] 	= array();
-					$ligne["mangaImg"] 	= "";
+					$ligne["source_URL"] = $manga["source"];
+					$ligne["source_ID"]  = $manga["mangaId"];
+					$ligne["title"]      = $manga["name"];
+					$ligne["genres"] 	 = array();
+					$ligne["cover"] 	 = "";
 					array_push($allData,$ligne);
 				}else if(array_key_exists("i",$manga)){
 					// MangaEden
-					$ligne["sourceID"] 	= "mangaeden.com";
-					$ligne["mangaID"] 	= $manga["i"];
-					$ligne["mangaName"] = $manga["t"];
-					$ligne["genres"] 	= $manga["c"];
-					$ligne["mangaImg"] 	= $manga["im"];
+					$ligne["source_URL"] = "mangaeden.com";
+					$ligne["source_ID"]  = $manga["i"];
+					$ligne["title"]      = $manga["t"];
+					$ligne["genres"]  	 = $manga["c"];
+					$ligne["cover"] 	 = $manga["im"];
 					array_push($allData,$ligne);
 				}
 			}
