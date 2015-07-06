@@ -15,7 +15,7 @@ function GetMangaAPI($context) {
 	$manga_info = ['source' => $context->params['source'], 'id' => $context->params['id']];
 
 	// Get manga
-	return getManga($manga_info);
+	return getManga($manga_info, $context->user);
 }
 
 /*

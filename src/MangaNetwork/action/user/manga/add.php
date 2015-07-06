@@ -13,7 +13,7 @@ include_once 'MangaNetwork/action/manga/utils.php';
 function AddMangaToUserAPI($context) {
 
 	// Get manga
-	$manga = getManga(['source' => $context->params['source'], 'id' => $context->params['id']]);
+	$manga = getManga(['source' => $context->params['source'], 'id' => $context->params['id']], $context->user);
 
 	// Add manga
 	$db = GetDBConnection();

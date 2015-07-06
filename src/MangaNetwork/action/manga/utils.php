@@ -26,12 +26,12 @@ function getUserMangaByID($id, $throw_on_null=false) {
  * @param  string $manga_info     The manga informations from the API
  * @return \MnManga       The retreived manga
  */
-function getManga($manga_info) {
+function getManga($manga_info, $user) {
 
 	$manga_info['api'] = guessAPIFromSource($manga_info['source']);
 
 	// Get the manga from the database
-	$manga = getMangaFromDatabase($manga_info['api'], $manga_info['source'], $manga_info['id']);
+	$manga = getMangaFromDatabase($manga_info['api'], $manga_info['source'], $manga_info['id'], $user);
 
 	if(!$manga) {
 		switch ($manga_info['api']) {
@@ -96,15 +96,7 @@ function getUserMangaFromDatabaseById($id, $user, $throw_on_null=false) {
 			return false;
 	}
 
-	// Prepare user infos
-	$data['user_info'] = [];
-	$data['user_info']['favoris'] = $data['favoris'];
-	$data['user_info']['update_date'] = $data['update_date'];
-	$data['user_info']['note'] = $data['note'];
-	$data['user_info']['page_cur'] = $data['page_cur'];
-	$data['user_info']['chapter_cur'] = $data['chapter_cur'];
-
-	return MnManga::initFrom(setMangaRelativeInfo($db, $data));
+	return MnManga::initFrom(setMangaRelativeInfo($db, $data, $user));
 }
 
 /**
@@ -115,7 +107,7 @@ function getUserMangaFromDatabaseById($id, $user, $throw_on_null=false) {
  * @param  string $id     The manga ID from the API
  * @return \MnManga             The found manga, or false
  */
-function getMangaFromDatabase($api, $source, $id, $throw_on_null=false) {
+function getMangaFromDatabase($api, $source, $id, $user, $throw_on_null=false) {
 
 	$db = GetDBConnection();
 
@@ -133,7 +125,7 @@ function getMangaFromDatabase($api, $source, $id, $throw_on_null=false) {
 			return false;
 	}
 
-	return MnManga::initFrom(setMangaRelativeInfo($db, $data));
+	return MnManga::initFrom(setMangaRelativeInfo($db, $data, $user));
 }
 
 /**
@@ -142,7 +134,7 @@ function getMangaFromDatabase($api, $source, $id, $throw_on_null=false) {
  * @param  string   $id   The manga unical ID
  * @return \MnManga       The found manga, or false
  */
-function getMangaFromDatabaseByID($id, $throw_on_null=false) {
+function getMangaFromDatabaseByID($id, $user, $throw_on_null=false) {
 
 	$db = GetDBConnection();
 
@@ -159,13 +151,13 @@ function getMangaFromDatabaseByID($id, $throw_on_null=false) {
 			return false;
 	}
 
-	return MnManga::initFrom(setMangaRelativeInfo($db, $data));
+	return MnManga::initFrom(setMangaRelativeInfo($db, $data, $user));
 }
 
 /**
  * Set the manga relative info from the database
  */
-function setMangaRelativeInfo($db, $data) {
+function setMangaRelativeInfo($db, $data, $user) {
 
 	// Get genre
 	$query = $db->prepare("SELECT genre.name FROM genre JOIN genre_has_manga
@@ -184,6 +176,14 @@ function setMangaRelativeInfo($db, $data) {
 		                   WHERE manga_chapter.manga_id = ?");
 	$query->execute([$data['id']]);
 	$data['chapters'] = $query->fetchAll(PDO::FETCH_ASSOC);
+
+	// Get user info (if any, for the current user)
+
+	// Get manga
+	$query = $db->prepare("SELECT * FROM user_has_manga 
+						   WHERE user_has_manga.manga_id = ? AND user_has_manga.user_id = ?");
+	$query->execute([$data['id'], $user->id]);
+	$data['user_info'] = $query->fetch(PDO::FETCH_ASSOC);
 
 	return $data;
 }

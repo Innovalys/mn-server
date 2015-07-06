@@ -10,7 +10,7 @@ function GetUserMangaChapterAPI($context) {
 	$manga_info = ['source' => $context->params['source'], 'id' => $context->params['id']];
 
 	// Get manga
-	$manga = getManga($manga_info);
+	$manga = getManga($manga_info, $context->user);
 
 	// TODO : check if manga is un user collection
 

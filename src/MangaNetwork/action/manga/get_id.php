@@ -12,7 +12,7 @@ include_once 'MangaNetwork/action/manga/utils.php';
  */
 function GetMangaID($context) {
 	// Get manga
-	return getMangaFromDatabaseByID($context->params['id'], true);
+	return getMangaFromDatabaseByID($context->params['id'], $context->user, true);
 }
 
 ?>

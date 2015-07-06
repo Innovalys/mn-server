@@ -13,7 +13,7 @@ include_once 'MangaNetwork/action/manga/utils.php';
 function AddMangaToUserID($context) {
 
 	// Get manga
-	$manga = getMangaFromDatabaseByID($context->params['id'], true);
+	$manga = getMangaFromDatabaseByID($context->params['id'], $context->user, true);
 
 	// Add manga
 	$db = GetDBConnection();

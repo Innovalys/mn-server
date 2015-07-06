@@ -8,7 +8,7 @@ function GetMangaChapterAPI($context) {
 	$manga_info = ['source' => $context->params['source'], 'id' => $context->params['id']];
 
 	// Get manga
-	$manga = getManga($manga_info);
+	$manga = getManga($manga_info, $context->user);
 
 	// Get chapter
 	return getMangaChapter($manga, $context->params['chapter_id']);
