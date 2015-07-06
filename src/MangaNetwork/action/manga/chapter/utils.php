@@ -81,8 +81,6 @@ function getMangaChapterFromMangaScrapper($manga, $chapter) {
 	    ],
 	    CURLOPT_URL => 'https://doodle-manga-scraper.p.mashape.com/' . $manga->source_URL . '/manga/' .  $manga->source_ID . '/' . $chapter->source_ID
 	]);
-	var_dump(curl_exec($curl));
-	var_dump(curl_getinfo($curl, CURLINFO_HTTP_CODE));
 	$rawResponse = json_decode(curl_exec($curl), true);
 
 	try {
@@ -108,7 +106,7 @@ function getMangaChapterFromMangaScrapper($manga, $chapter) {
 	$validator->validate($rawResponse);
 	$chapter_data = $validator->getValidatedValues();
 
-	if(!empty($chapter_data['lastUpdate']))
+	if(empty($chapter_data['pages']))
 		throw new MnException("Error : no manga chapter could be retrieved with ID '" . $chapter->source_ID . "'", 404);
 
 	return updateChapter($chapter, $chapter_data);
