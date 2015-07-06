@@ -43,9 +43,12 @@ class MnManga {
         	$this->user_info['chapter_cur'] = 0 + $this->user_info['chapter_cur'];
         	$this->user_info['page_cur'] = 0 + $this->user_info['page_cur'];
 
+        	$this->user_info['favoris'] = ($this->user_info['favoris'] == 1);
+
         	if($this->user_info['note'] != NULL)
         		$this->user_info['note'] = 0 + $this->user_info['note'];
-        }
+        } else
+        	$this->user_info = false;
 
         if($this->chapters) {
         	for($i = 0; $i < count($this->chapters); $i++) {
