@@ -81,6 +81,8 @@ function getMangaChapterFromMangaScrapper($manga, $chapter) {
 	    ],
 	    CURLOPT_URL => 'https://doodle-manga-scraper.p.mashape.com/' . $manga->source_URL . '/manga/' .  $manga->source_ID . '/' . $chapter->source_ID
 	]);
+	var_dump(curl_exec($curl));
+	var_dump(curl_getinfo($curl, CURLINFO_HTTP_CODE));
 	$rawResponse = json_decode(curl_exec($curl), true);
 
 	try {
@@ -106,9 +108,7 @@ function getMangaChapterFromMangaScrapper($manga, $chapter) {
 	$validator->validate($rawResponse);
 	$chapter_data = $validator->getValidatedValues();
 
-	//$chapter_data['lastUpdate'] = 
-
-	if(!$chapter_data['name'])
+	if(!empty($chapter_data['lastUpdate']))
 		throw new MnException("Error : no manga chapter could be retrieved with ID '" . $chapter->source_ID . "'", 404);
 
 	return updateChapter($chapter, $chapter_data);
@@ -156,7 +156,7 @@ function getMangaChapterFromMangaEden($manga, $chapter) {
 	$chapter_data['pages'] = [];
 
 	foreach ($chapter_data['images'] as $url) {
-		$chapter_data['pages'][] = ['url' => $url[1]];
+		$chapter_data['pages'][] = ['url' => "https://cdn.mangaeden.com/mangasimg/" . $url[1]];
 	}
 
 	return updateChapter($chapter, $chapter_data);
@@ -175,6 +175,7 @@ function updateChapter($chapter, $chapter_data) {
 	$i = 1;
 
 	foreach ($chapter_data['pages'] as $page) {
+
 		$query = $db->prepare("INSERT INTO manga_page (link, manga_chapter_id, page_nb)
 			                   VALUES (?, ?, ?)");
 		$query->execute([$page['url'], $chapter->id, $i]);

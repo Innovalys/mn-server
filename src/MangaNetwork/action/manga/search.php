@@ -58,11 +58,14 @@
 			    ],
 			    CURLOPT_URL => 'http://www.mangaeden.com/api/list/0/'
 			]);
+
 			$rawResponse = json_decode(curl_exec($curl),true);
 			$rep = array(count($rawResponse["manga"]));
-			foreach($rawResponse["manga"] as $manga){
-				if(strripos($manga["t"],$_query) != false){
-					array_push($rep, $manga);
+			if(isset($rawResponse["manga"]) AND !empty($rawResponse["manga"])) {
+				foreach($rawResponse["manga"] as $manga){
+					if(strripos($manga["t"],$_query) !== false){
+						array_push($rep, $manga);
+					}
 				}
 			}
 		}else if($_source == "mangafox.me" || $_source == "mangareader.net" || $_source == "mangastream.com"){

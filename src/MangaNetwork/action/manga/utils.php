@@ -343,6 +343,7 @@ function getMangaFromMangaEden($manga_info) {
 
 	$manga_data['authors'] = array_unique(array_merge($manga_data['artist_kw'], $manga_data['author_kw']));
 	$manga_data['genres']  = $manga_data["categories"];
+	$manga_data['cover'] = "https://cdn.mangaeden.com/mangasimg/" . $manga_data['cover'];
 
 	for ($i=0; $i < sizeof($manga_data['chapters']); $i++) { 
 		$manga_data['chapters'][$i]["title"] = $manga_data['chapters'][$i][2];
