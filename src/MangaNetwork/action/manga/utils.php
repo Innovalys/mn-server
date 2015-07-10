@@ -335,7 +335,7 @@ function getMangaFromMangaEden($manga_info) {
 	           'update_date'  => new DateTime(),                                         // Last edit : now
 	           'completed'    => $manga_data['status'] == 1,                             // True if completed, false otherwise
 	           'description'  => $manga_data['description'],                             // The manga description
-	           'cover'        => $manga_data['image']                                    // URL to the manga's cover
+	           'cover'        => "https://cdn.mangaeden.com/mangasimg/" .$manga_data['image'] // URL to the manga's cover
 	         ];
 
 	$manga['release_date'] = $manga['release_date']->format('Y-m-d H:i:s');

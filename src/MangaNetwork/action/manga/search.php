@@ -25,7 +25,7 @@
 			$rawResponse = json_decode(curl_exec($curl),true);
 
 			foreach($rawResponse["manga"] as $manga){
-				if(strripos($manga["t"],$_query) != false){
+				if(strripos($manga["t"],$_query) !== false){
 					array_push($rep, $manga);
 				}
 			}
@@ -113,7 +113,7 @@
 					$ligne["source_ID"]  = $manga["i"];
 					$ligne["title"]      = $manga["t"];
 					$ligne["genres"] 	 = $manga["c"];
-					$ligne["cover"]      = $manga["im"];
+					$ligne["cover"]      = "https://cdn.mangaeden.com/mangasimg/" . $manga["im"];
 					array_push($allData,$ligne);
 				}
 			}
@@ -155,7 +155,7 @@
 					$ligne["source_ID"]  = $manga["i"];
 					$ligne["title"]      = $manga["t"];
 					$ligne["genres"]  	 = $manga["c"];
-					$ligne["cover"] 	 = $manga["im"];
+					$ligne["cover"] 	 = "https://cdn.mangaeden.com/mangasimg/" . $manga["im"];
 					array_push($allData,$ligne);
 				}
 			}
