@@ -31,7 +31,7 @@ function SearchOnePersonnalManga($context) {
 	
 	foreach ($data as $manga) {
 		// Init a new manga
-		$myArray[] = MnManga::initFrom(setMangaRelativeInfo($db, $manga, $context->user);
+		$myArray[] = MnManga::initFrom(setMangaRelativeInfo($db, $manga, $context->user));
 	}
 	
 	return $myArray ;
