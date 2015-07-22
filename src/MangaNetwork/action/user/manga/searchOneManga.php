@@ -30,26 +30,8 @@ function SearchOnePersonnalManga($context) {
 	$myArray = []; // List of mangas
 	
 	foreach ($data as $manga) {
-		// Get genres
-		$query = $db->prepare("SELECT genre.name FROM genre JOIN genre_has_manga
-							   WHERE genre_has_manga.manga_id = ? AND genre_has_manga.genre_id = genre.id");
-		$query->execute([$manga['id']]);
-		$manga['genres'] = $query->fetchAll(PDO::FETCH_COLUMN, 0);
-
-		// Get authors
-		$query = $db->prepare("SELECT author.name FROM author JOIN author_has_manga
-							   WHERE author_has_manga.manga_id = ? AND author_has_manga.author_id = author.id");
-		$query->execute([$manga['id']]);
-		$manga['authors'] = $query->fetchAll(PDO::FETCH_COLUMN, 0);
-		
-		// Get chapters
-		$query = $db->prepare("SELECT manga_chapter.id, manga_chapter.title  FROM manga_chapter 
-							   WHERE manga_chapter.manga_id = ?");
-		$query->execute([$manga['id']]);
-		$manga['chapters'] = $query->fetchAll(PDO::FETCH_ASSOC);
-		
 		// Init a new manga
-		$myArray[] = MnManga::initFrom($manga);
+		$myArray[] = MnManga::initFrom(setMangaRelativeInfo($db, $manga, $context->user);
 	}
 	
 	return $myArray ;
