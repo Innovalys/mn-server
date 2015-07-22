@@ -26,14 +26,14 @@ function getUserMangaByID($id, $throw_on_null=false) {
  * @param  string $manga_info     The manga informations from the API
  * @return \MnManga       The retreived manga
  */
-function getManga($manga_info, $user) {
+function getManga($manga_info, $user, $only_local=false) {
 
 	$manga_info['api'] = guessAPIFromSource($manga_info['source']);
 
 	// Get the manga from the database
 	$manga = getMangaFromDatabase($manga_info['api'], $manga_info['source'], $manga_info['id'], $user);
 
-	if(!$manga) {
+	if(!$manga && !$only_local) {
 		switch ($manga_info['api']) {
 			case 'mangascrapper':
 				return getMangaFromMangaScrapper($manga_info);

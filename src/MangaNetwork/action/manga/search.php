@@ -1,12 +1,13 @@
 <?php 
 	include_once 'MangaNetwork/utils.php';
 
-	function SearchManga($_context){
-		$query = $_context->params["query"];
-		$source = $_context->params["source"];
-		return GetResult($source,$query);
+	function SearchManga($context){
+		$query = $context->params["query"];
+		$source = $context->params["source"];
+		return GetResult($context, $source,$query);
 	}
-	function GetResult($_source,$_query){
+
+	function GetResult($context, $_source, $_query){
 		$curl = curl_init();
 		$rep = array();
 		if($_source == NULL || $_source == " "){
@@ -91,10 +92,11 @@
 			throw new MnException("Error : error while retrieving mangas for '" . $_query . " on ".$_source, 400);
 		}
 		curl_close($curl);
-		return unificateData($_source,$rep);
+		return unificateData($context, $_source,$rep);
 		//return $rep;
 	}
-	function unificateData($_src,$_tabData){
+
+	function unificateData($context, $_src,$_tabData){
 		$allData = array();
 		
 		$ligne = array(
@@ -160,9 +162,22 @@
 				}
 			}
 			
-		}else{
-
 		}
-		return $allData;
+
+		$results = [];
+
+		// Get already cached manga infos
+		foreach ($allData as $manga) {
+
+			$localManga = getManga([ 'source' => $manga["source_URL"],
+			                         'id'     => $manga["source_ID"]], $context->user, true);
+
+			if($localManga)
+				$results[] = $localManga;
+			else
+				$results[] = $manga;
+		}
+
+		return $results;
 	}
 ?>
