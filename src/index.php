@@ -11,6 +11,7 @@ include_once 'MangaNetwork/exception.php';
 include_once 'MangaNetwork/action_router.php';
 
 include_once 'MangaNetwork/action/user/get.php';
+include_once 'MangaNetwork/action/user/edit.php';
 include_once 'MangaNetwork/action/user/create.php';
 include_once 'MangaNetwork/action/user/search.php';
 include_once 'MangaNetwork/action/user/manga/get.php';
@@ -53,6 +54,10 @@ try {
 	// == User search ==
 	$router->addRule(new MnActionRule("/mn-server\/user\/search\/([^\/]+)\/?$/", "GET", MnUser::USER, ['login'], function($context) {
 		render(SearchUser($context));
+	}));
+	// == User modification ==
+	$router->addRule(new MnActionRule("/mn-server\/user\/?$/", "POST", MnUser::USER, [], function($context) {
+		render(UpdateUser($context));
 	}));
 
 	// == Manga actions ==
